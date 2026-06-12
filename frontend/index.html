@@ -1,12 +1,276 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WaterBridge LMS</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WaterBridge LMS 로그인</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Pretendard',sans-serif;
+}
+
+body{
+background:#0f172a;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.container{
+width:100%;
+max-width:420px;
+background:white;
+padding:40px;
+border-radius:20px;
+box-shadow:0 20px 50px rgba(0,0,0,.2);
+}
+
+.logo{
+text-align:center;
+margin-bottom:30px;
+}
+
+.logo h1{
+font-size:30px;
+color:#2563eb;
+}
+
+.logo p{
+color:#666;
+margin-top:5px;
+}
+
+.input-group{
+margin-bottom:15px;
+}
+
+.input-group label{
+display:block;
+margin-bottom:6px;
+font-weight:600;
+}
+
+.input-group input{
+width:100%;
+padding:14px;
+border:1px solid #ddd;
+border-radius:10px;
+font-size:15px;
+}
+
+.btn{
+width:100%;
+padding:15px;
+border:none;
+border-radius:10px;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+transition:.3s;
+}
+
+.login-btn{
+background:#2563eb;
+color:white;
+margin-top:10px;
+}
+
+.login-btn:hover{
+background:#1d4ed8;
+}
+
+.signup-btn{
+background:#10b981;
+color:white;
+margin-top:10px;
+}
+
+.signup-btn:hover{
+background:#059669;
+}
+
+.reset-btn{
+background:#f59e0b;
+color:white;
+margin-top:10px;
+}
+
+.reset-btn:hover{
+background:#d97706;
+}
+
+.msg{
+margin-top:15px;
+text-align:center;
+font-size:14px;
+font-weight:600;
+}
+
+.footer{
+margin-top:20px;
+text-align:center;
+color:#888;
+font-size:13px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="logo">
+<h1>WaterBridge LMS</h1>
+<p>회원 로그인</p>
+</div>
+
+<div class="input-group">
+<label>이메일</label>
+<input type="email" id="email" placeholder="example@email.com">
+</div>
+
+<div class="input-group">
+<label>비밀번호</label>
+<input type="password" id="password" placeholder="비밀번호 입력">
+</div>
+
+<button class="btn login-btn" onclick="login()">
+로그인
+</button>
+
+<button class="btn signup-btn" onclick="signup()">
+회원가입
+</button>
+
+<button class="btn reset-btn" onclick="resetPassword()">
+비밀번호 찾기
+</button>
+
+<div class="msg" id="msg"></div>
+
+<div class="footer">
+© WaterBridge LMS
+</div>
+
+</div>
+
+<!-- Firebase -->
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getAuth,
+signInWithEmailAndPassword,
+createUserWithEmailAndPassword,
+sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDMn3t5QHpOSVqdAXsf8Bbh5TwXPqYIfpg",
+  authDomain: "waterbridge-lms.firebaseapp.com",
+  projectId: "waterbridge-lms",
+  storageBucket: "waterbridge-lms.firebasestorage.app",
+  messagingSenderId: "224313355988",
+  appId: "1:224313355988:web:886787fb9402df4f8e9541"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const ADMIN_EMAIL = "admin@waterbridge.com";
+
+window.login = async () => {
+
+const email = document.getElementById("email").value;
+const password = document.getElementById("password").value;
+
+try{
+
+await signInWithEmailAndPassword(auth,email,password);
+
+document.getElementById("msg").innerHTML =
+"로그인 성공";
+
+if(email === ADMIN_EMAIL){
+
+location.href = "admin.html";
+
+}else{
+
+location.href = "user.html";
+
+}
+
+}catch(err){
+
+document.getElementById("msg").innerHTML =
+err.message;
+
+}
+
+};
+
+window.signup = async () => {
+
+const email = document.getElementById("email").value;
+const password = document.getElementById("password").value;
+
+try{
+
+await createUserWithEmailAndPassword(
+auth,
+email,
+password
+);
+
+document.getElementById("msg").innerHTML =
+"회원가입 완료";
+
+}catch(err){
+
+document.getElementById("msg").innerHTML =
+err.message;
+
+}
+
+};
+
+window.resetPassword = async () => {
+
+const email = document.getElementById("email").value;
+
+if(!email){
+
+alert("이메일을 입력해주세요");
+return;
+
+}
+
+try{
+
+await sendPasswordResetEmail(auth,email);
+
+document.getElementById("msg").innerHTML =
+"비밀번호 재설정 메일 발송";
+
+}catch(err){
+
+document.getElementById("msg").innerHTML =
+err.message;
+
+}
+
+};
+
+</script>
+
+</body>
 </html>
