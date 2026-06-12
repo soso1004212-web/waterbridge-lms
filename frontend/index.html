@@ -73,37 +73,22 @@ border-radius:10px;
 font-size:16px;
 font-weight:600;
 cursor:pointer;
-transition:.3s;
+margin-top:10px;
 }
 
 .login-btn{
 background:#2563eb;
 color:white;
-margin-top:10px;
-}
-
-.login-btn:hover{
-background:#1d4ed8;
 }
 
 .signup-btn{
 background:#10b981;
 color:white;
-margin-top:10px;
-}
-
-.signup-btn:hover{
-background:#059669;
 }
 
 .reset-btn{
 background:#f59e0b;
 color:white;
-margin-top:10px;
-}
-
-.reset-btn:hover{
-background:#d97706;
 }
 
 .msg{
@@ -121,6 +106,7 @@ font-size:13px;
 }
 </style>
 </head>
+
 <body>
 
 <div class="container">
@@ -130,56 +116,46 @@ font-size:13px;
 <p>회원 로그인</p>
 </div>
 
+<!-- 로그인만 -->
 <div class="input-group">
 <label>이메일</label>
-<input type="email" id="email" placeholder="example@email.com">
+<input type="email" id="loginEmail" placeholder="example@email.com">
 </div>
 
 <div class="input-group">
 <label>비밀번호</label>
-<input type="password" id="password" placeholder="비밀번호 입력">
+<input type="password" id="loginPassword" placeholder="비밀번호">
 </div>
 
-<button class="btn login-btn" onclick="login()">
-로그인
-</button>
+<button class="btn login-btn" onclick="login()">로그인</button>
 
-<button class="btn signup-btn" onclick="signup()">
-회원가입
-</button>
+<button class="btn signup-btn" onclick="goSignup()">회원가입</button>
 
-<button class="btn reset-btn" onclick="resetPassword()">
-비밀번호 찾기
-</button>
+<button class="btn reset-btn" onclick="resetPassword()">비밀번호 찾기</button>
 
 <div class="msg" id="msg"></div>
 
-<div class="footer">
-© WaterBridge LMS
-</div>
+<div class="footer">© WaterBridge LMS</div>
 
 </div>
 
 <!-- Firebase -->
 <script type="module">
 
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
 getAuth,
 signInWithEmailAndPassword,
-createUserWithEmailAndPassword,
 sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDMn3t5QHpOSVqdAXsf8Bbh5TwXPqYIfpg",
-  authDomain: "waterbridge-lms.firebaseapp.com",
-  projectId: "waterbridge-lms",
-  storageBucket: "waterbridge-lms.firebasestorage.app",
-  messagingSenderId: "224313355988",
-  appId: "1:224313355988:web:886787fb9402df4f8e9541"
+apiKey: "AIzaSyDMn3t5QHpOSVqdAXsf8Bbh5TwXPqYIfpg",
+authDomain: "waterbridge-lms.firebaseapp.com",
+projectId: "waterbridge-lms",
+storageBucket: "waterbridge-lms.appspot.com",
+messagingSenderId: "224313355988",
+appId: "1:224313355988:web:886787fb9402df4f8e9541"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -189,83 +165,45 @@ const ADMIN_EMAIL = "admin@waterbridge.com";
 
 window.login = async () => {
 
-const email = document.getElementById("email").value;
-const password = document.getElementById("password").value;
+const email = document.getElementById("loginEmail").value;
+const password = document.getElementById("loginPassword").value;
 
 try{
 
 await signInWithEmailAndPassword(auth,email,password);
 
-document.getElementById("msg").innerHTML =
-"로그인 성공";
+document.getElementById("msg").innerText = "로그인 성공";
 
 if(email === ADMIN_EMAIL){
-
 location.href = "admin.html";
-
 }else{
-
 location.href = "user.html";
-
 }
 
-}catch(err){
-
-document.getElementById("msg").innerHTML =
-err.message;
-
+}catch(e){
+document.getElementById("msg").innerText = e.message;
 }
 
 };
 
-window.signup = async () => {
-
-const email = document.getElementById("email").value;
-const password = document.getElementById("password").value;
-
-try{
-
-await createUserWithEmailAndPassword(
-auth,
-email,
-password
-);
-
-document.getElementById("msg").innerHTML =
-"회원가입 완료";
-
-}catch(err){
-
-document.getElementById("msg").innerHTML =
-err.message;
-
-}
-
+window.goSignup = () => {
+location.href = "signup.html";
 };
 
 window.resetPassword = async () => {
 
-const email = document.getElementById("email").value;
+const email = document.getElementById("loginEmail").value;
 
 if(!email){
-
-alert("이메일을 입력해주세요");
+document.getElementById("msg").innerText = "이메일 입력 필요";
 return;
-
 }
 
 try{
-
 await sendPasswordResetEmail(auth,email);
-
-document.getElementById("msg").innerHTML =
-"비밀번호 재설정 메일 발송";
-
-}catch(err){
-
-document.getElementById("msg").innerHTML =
-err.message;
-
+document.getElementById("msg").innerText = "메일 전송 완료";
+}catch(e){
+document.getElementById("msg").innerText = e.message;
 }
 
 };
