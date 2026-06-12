@@ -6,36 +6,32 @@ export default function Login() {
 
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    try {
+  const login = async () => {
 
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
 
-      const userCredential =
-        await signInWithEmailAndPassword(auth, email, password);
+    const userCredential =
+      await signInWithEmailAndPassword(auth, email, password);
 
-      const user = userCredential.user;
+    const user = userCredential.user;
 
-      // 🔥 관리자 / 일반 사용자 분기
-      if (user.email === "admin@waterbridge.com") {
-        navigate("/admin");
-      } else {
-        navigate("/dashboard");
-      }
-
-    } catch (error) {
-      console.log(error);
+    if (user.email === "admin@waterbridge.com") {
+      navigate("/admin");
+    } else {
+      navigate("/dashboard");
     }
   };
 
   return (
     <div>
-      <input id="email" />
-      <input id="password" type="password" />
+      <input id="loginEmail" />
+      <input id="loginPassword" type="password" />
 
-      <button onClick={handleLogin}>
-        로그인
+      <button onClick={login}>로그인</button>
+
+      <button onClick={() => navigate("/signup")}>
+        회원가입
       </button>
     </div>
   );

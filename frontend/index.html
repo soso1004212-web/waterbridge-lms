@@ -165,29 +165,41 @@ const ADMIN_EMAIL = "admin@waterbridge.com";
 
 window.login = async () => {
 
-const email = document.getElementById("loginEmail").value;
-const password = document.getElementById("loginPassword").value;
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
 
-try{
+  // 🔥 1차 방어
+  if (!email || !password) {
+    document.getElementById("msg").innerText = "이메일/비밀번호 입력 필요";
+    return;
+  }
 
-await signInWithEmailAndPassword(auth,email,password);
+  // 🔥 이메일 형식 체크 (핵심)
+  if (!email.includes("@")) {
+    document.getElementById("msg").innerText = "이메일 형식이 잘못됨";
+    return;
+  }
 
-document.getElementById("msg").innerText = "로그인 성공";
+  try {
 
-if(email === ADMIN_EMAIL){
-location.href = "/frontend/admin.html";
-}else{
-location.href = "/frontend/user.html";
-}
+    await signInWithEmailAndPassword(auth, email, password);
 
-}catch(e){
-document.getElementById("msg").innerText = e.message;
-}
+    document.getElementById("msg").innerText = "로그인 성공";
 
+    if (email === ADMIN_EMAIL) {
+      location.href = "/admin";
+    } else {
+      location.href = "/dashboard";
+    }
+
+  } catch (e) {
+    console.log(e.code, e.message);
+    document.getElementById("msg").innerText = e.message;
+  }
 };
 
 window.goSignup = () => {
-location.href = "/frontend/signup.html";
+location.href = "/signup";
 };
 
 window.resetPassword = async () => {
