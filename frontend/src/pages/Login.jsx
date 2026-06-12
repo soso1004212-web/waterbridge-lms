@@ -1,40 +1,42 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../services/firebase";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+  const navigate = useNavigate();
 
-    console.log("로그인 시도", email);
+  const handleLogin = async () => {
+    try {
 
-    // Firebase 로그인 연결 예정
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const userCredential =
+        await signInWithEmailAndPassword(auth, email, password);
+
+      const user = userCredential.user;
+
+      // 🔥 관리자 / 일반 사용자 분기
+      if (user.email === "admin@waterbridge.com") {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
-    <div className="page">
-      <div className="card">
-        <h1>WaterBridge LMS</h1>
+    <div>
+      <input id="email" />
+      <input id="password" type="password" />
 
-        <form onSubmit={handleLogin}>
-          <input
-            type="email"
-            placeholder="이메일"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-
-          <input
-            type="password"
-            placeholder="비밀번호"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          <button type="submit">로그인</button>
-        </form>
-      </div>
+      <button onClick={handleLogin}>
+        로그인
+      </button>
     </div>
   );
 }
