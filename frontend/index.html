@@ -187,9 +187,9 @@ window.login = async () => {
     document.getElementById("msg").innerText = "로그인 성공";
 
     if (email === ADMIN_EMAIL) {
-      location.href = "/admin";
+      location.href = "/admin.html";
     } else {
-      location.href = "/dashboard";
+      location.href = "/user.html";
     }
 
   } catch (e) {
@@ -199,7 +199,7 @@ window.login = async () => {
 };
 
 window.goSignup = () => {
-location.href = "/signup";
+location.href = "/signup.html";
 };
 
 window.resetPassword = async () => {
