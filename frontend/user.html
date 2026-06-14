@@ -515,6 +515,11 @@ function applyCourseLock(data){
 --------------------------*/
 async function openVideo(url, courseId){
 
+const courseTitles = {
+  lms_basic: "보이스피싱 기초편",
+  invest_basic: "보이스피싱 중급편"
+};
+
   currentCourseId = courseId;
 
   const video = document.getElementById("videoFrame");
@@ -595,6 +600,11 @@ async function closeVideo(){
   clearInterval(videoInterval);
 
   if(!currentCourseId) return;
+await updateDoc(window.userRef, {
+  currentCourse: null,
+  currentCourseTitle: null,
+  lastSeen: Date.now()
+});
 
   await window.updateDoc(window.userRef, {
     [`videoProgress.${currentCourseId}`]: currentTime
@@ -635,9 +645,11 @@ async function setOnlineStatus() {
   if(!window.userRef) return;
 
   await updateDoc(window.userRef, {
-    online: true,
-    lastSeen: Date.now()
-  });
+  currentCourse: courseId,
+  currentCourseTitle: courseTitles[courseId] || "강의 시청중",
+  online: true,
+  lastSeen: Date.now()
+});
 }
 
 onAuthStateChanged(auth, async (user) => {

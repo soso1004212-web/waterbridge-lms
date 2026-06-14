@@ -124,6 +124,10 @@ th{
 <!-- 유저 목록 -->
 <div class="box">
   <h3>👥 유저 목록</h3>
+<div class="box">
+  <h3>🎥 실시간 강의 시청 현황</h3>
+  <div id="liveCourses"></div>
+</div>
   <button onclick="loadUsers()">새로고침</button>
 
   <table>
@@ -194,7 +198,7 @@ onAuthStateChanged(auth, async (user) => {
 
   document.getElementById("status").innerHTML =
     "✅ 관리자 로그인: " + (data.name || user.email);
-
+startLiveWatching();
   startOnlineListener(); // 🔥 접속자 실시간 시작
 });
 
@@ -233,6 +237,39 @@ window.addCourse = async function(){
    유저 목록
 --------------------------*/
 window.loadUsers = async function(){
+
+function startLiveWatching(){
+
+  const box = document.getElementById("liveCourses");
+
+  onSnapshot(collection(db, "users"), (snap) => {
+
+    box.innerHTML = "";
+
+    snap.forEach(docu => {
+      const u = docu.data();
+
+      if(u.online && u.currentCourse){
+
+        const div = document.createElement("div");
+
+        div.style.padding = "10px";
+        div.style.borderBottom = "1px solid #eee";
+
+        div.innerHTML = `
+          <b>${u.name || "이름 없음"}</b><br>
+          📚 현재 강의: <b>${u.currentCourseTitle || u.currentCourse}</b><br>
+          🟢 상태: ONLINE
+        `;
+
+        box.appendChild(div);
+      }
+    });
+
+  });
+}
+
+
 
   const snap = await getDocs(collection(db,"users"));
   const tbody = document.getElementById("userTable");
