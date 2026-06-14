@@ -208,7 +208,27 @@ if (snap.exists()) {
 } else {
   sessionStorage.setItem("role", "user");
 }
+if (snap.exists()) {
+  const data = snap.data();
 
+  const role = data.role || "user";
+
+  sessionStorage.setItem("role", role);
+  sessionStorage.setItem("name", data.name || user.email);
+
+  // ✅ 여기 추가 (페이지 이동)
+  if (role === "admin") {
+    window.location.href = "admin.html";
+  } else {
+    window.location.href = "user.html";
+  }
+
+} else {
+  sessionStorage.setItem("role", "user");
+
+  // 기본 이동
+  window.location.href = "user.html";
+}
   } catch (e) {
     let msg = "로그인 오류";
 
