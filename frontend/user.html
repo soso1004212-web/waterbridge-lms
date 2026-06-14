@@ -414,6 +414,40 @@ function toggleMenu(){
 }
 
 let currentCourseId = null;
+let videoInterval = null;
+let currentTime = 0;
+function renderCompletedCourses(data){
+  const completed = data.completedCourseIds || [];
+
+  completed.forEach(id => {
+
+    const check = document.getElementById("check-" + id);
+    if(check){
+      check.textContent = "✔";
+      check.style.display = "inline-block";
+    }
+
+    const card = document.querySelector(`[data-course-id="${id}"]`);
+    if(card){
+      card.classList.add("completed");
+    }
+
+  });
+}
+function disableCompletedButtons(data){
+  const completed = data.completedCourseIds || [];
+
+  completed.forEach(id => {
+    const card = document.querySelector(`[data-course-id="${id}"]`);
+    if(card){
+      const btn = card.querySelector(".watch-btn");
+      if(btn){
+        btn.textContent = "완료됨";
+        btn.disabled = true;
+      }
+    }
+  });
+}
 
 /* ✔ 표시 + 카드 상태 */
 function renderCompletedCourses(data){
@@ -457,12 +491,21 @@ function openVideo(url, courseId){
 
   document.getElementById("videoFrame").src = url;
   document.getElementById("videoModal").style.display = "flex";
+
+  window.getDoc(window.userRef).then(snap => {
+    const data = snap.data();
+
+    currentTime = data.videoProgress?.[courseId] || 0;
+
+    startTracking();
+  });
 }
 
 /* 영상 닫기 + 완료 처리 */
 async function closeVideo(){
   document.getElementById("videoFrame").src = "";
   document.getElementById("videoModal").style.display = "none";
+clearInterval(videoInterval);
 
   if(!currentCourseId) return;
 
@@ -476,10 +519,49 @@ async function closeVideo(){
 
   // 이미 완료면 종료
   if(data.completedCourseIds?.includes(currentCourseId)){
+await window.updateDoc(userRef, {
+  [`videoProgress.${currentCourseId}`]: currentTime
+});
     currentCourseId = null;
     return;
   }
+function startTracking(){
 
+  clearInterval(videoInterval);
+
+  videoInterval = setInterval(() => {
+    currentTime += 1;
+
+    if(currentTime >= 480){
+      markAsCompleted();
+    }
+
+  }, 1000);
+}
+
+async function markAsCompleted(){
+
+  if(!currentCourseId) return;
+
+  const userRef = window.userRef;
+
+  const snap = await window.getDoc(userRef);
+  const data = snap.data();
+
+  if(data.completedCourseIds?.includes(currentCourseId)){
+    return;
+  }
+
+  await window.updateDoc(userRef, {
+    completedCourseIds: window.arrayUnion(currentCourseId),
+    completedCourses: window.increment(1)
+  });
+
+  clearInterval(videoInterval);
+
+  renderCompletedCourses(data);
+  disableCompletedButtons(data);
+}
   await window.updateDoc(userRef, {
     completedCourseIds: window.arrayUnion(currentCourseId),
     completedCourses: window.increment(1)
