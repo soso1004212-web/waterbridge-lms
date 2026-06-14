@@ -149,17 +149,14 @@ oninput="validateForm()">
 
 import { auth, db } from "./firebase-config.js";
 
+import { doc, setDoc } 
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
   updateProfile
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-
-import {
-  getFirestore,
-  doc,
-  setDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDMn3t5QHpOSVqdAXsf8Bbh5TwXPqYIfpg",
@@ -169,8 +166,6 @@ const firebaseConfig = {
   messagingSenderId: "224313355988",
   appId: "1:224313355988:web:886787fb9402df4f8e9541"
 };
-
-const db = getFirestore(app);
 
 // 🔥 버튼 상태 전체 관리
 window.validateForm = () => {
@@ -260,12 +255,8 @@ document.getElementById("msg").innerText =
 "회원가입 완료! 이메일 인증 후 로그인해주세요.";
 
 setTimeout(()=>{
-  location.href="index.html";
-},2000);
-
-  setTimeout(()=>{
-    location.href = "index.html";
-  }, 1000);
+  location.href = "index.html";
+}, 2000);
 
 }catch(err){
 
