@@ -201,18 +201,16 @@ window.login = async () => {
 
     const snap = await getDoc(doc(db, "users", user.uid));
 
-    // 🔥 핵심: URL 이동 금지 → index로만 이동
-    location.href = "/";
+if (snap.exists()) {
+  const data = snap.data();
+  sessionStorage.setItem("role", data.role || "user");
+  sessionStorage.setItem("name", data.name || user.email);
+} else {
+  sessionStorage.setItem("role", "user");
+}
 
-    // role 저장 (sessionStorage로 앱처럼 사용)
-    if (snap.exists()) {
-      const data = snap.data();
-
-      sessionStorage.setItem("role", data.role || "user");
-      sessionStorage.setItem("name", data.name || user.email);
-    } else {
-      sessionStorage.setItem("role", "user");
-    }
+// ✅ 저장 먼저
+location.href = "/index.html";
 
   } catch (e) {
     let msg = "로그인 오류";
