@@ -671,7 +671,6 @@ window.setOnlineStatus = async function(courseId, courseTitles) {
 };
 
 onAuthStateChanged(auth, async (user) => {
-
   if (!user) {
     location.replace("index.html");
     return;
@@ -685,10 +684,10 @@ onAuthStateChanged(auth, async (user) => {
 
   const data = snap.data();
 
-  // ✅ 여기서 연결 상태 바꾸기
+  // ✅ 온라인 상태
   document.getElementById("onlineStatus").innerText = "🟢 온라인";
 
-  // UI 업데이트는 여기 안으로 넣어야 안전
+  // UI 업데이트
   document.getElementById("userName").textContent = data.name || "";
   document.getElementById("userGrade").textContent = data.grade || "";
   document.getElementById("userEmail").textContent = data.email || "";
