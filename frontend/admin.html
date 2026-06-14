@@ -156,12 +156,6 @@ th{
 
 <script type="module">
 
-onAuthStateChanged(auth, (user) => {
-  if(!user){
-    location.replace("index.html");
-  }
-});
-
 import { auth, db } from "./firebase-config.js";
 
 import {
@@ -215,6 +209,9 @@ await setDoc(doc(db, "users", user.uid), {
     "✅ 관리자 로그인: " + (data.name || user.email);
 
   startOnlineListener(); // 🔥 접속자 실시간 시작
+if(window._onlineListenerStarted) return;
+window._onlineListenerStarted = true;
+startLiveWatching();
 });
 
 /* -------------------------
@@ -342,7 +339,7 @@ function startOnlineListener(){
     snap.forEach(docu => {
       const u = docu.data();
 
-      const isOnline = u.lastSeen && (Date.now() - u.lastSeen < 30000);
+      const isOnline = u.online === true;
 
       if(isOnline) count++;
 
@@ -377,18 +374,16 @@ function startOnlineListener(){
   });
 }
 
-window.addEventListener("beforeunload", async () => {
+window.addEventListener("beforeunload", () => {
   const user = auth.currentUser;
   if (!user) return;
 
-  const { updateDoc, doc } = await import(
-    "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js"
-  );
+  const { doc, updateDoc } = window.firebaseFns || {};
 
-  await updateDoc(doc(db, "users", user.uid), {
-    online: false,
-    lastSeen: Date.now()
-});
+  navigator.sendBeacon?.(
+    "/log",
+    JSON.stringify({ uid: user.uid })
+  );
 });
 window.addEventListener("pageshow", (event) => {
   if (event.persisted) {
