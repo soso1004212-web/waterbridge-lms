@@ -114,6 +114,8 @@ align-items:center;
 
 <h1>WaterBridge 회원가입</h1>
 
+<input id="name" class="input" placeholder="성함"
+oninput="validateForm()">
 <input id="email" class="input" placeholder="이메일"
 oninput="validateForm(); this.value=this.value.replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g,'')">
 
@@ -146,7 +148,12 @@ oninput="validateForm()">
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDMn3t5QHpOSVqdAXsf8Bbh5TwXPqYIfpg",
@@ -220,9 +227,23 @@ if(password.length < 6){
 }
 
 try{
+  const name = document.getElementById("name").value;
+
+const userCredential =
   await createUserWithEmailAndPassword(auth, email, password);
 
-  document.getElementById("msg").innerText = "회원가입 성공";
+await updateProfile(userCredential.user, {
+  displayName: name
+});
+
+await sendEmailVerification(userCredential.user);
+
+document.getElementById("msg").innerText =
+"회원가입 완료! 이메일 인증 후 로그인해주세요.";
+
+setTimeout(()=>{
+  location.href="index.html";
+},2000);
 
   setTimeout(()=>{
     location.href = "index.html";
