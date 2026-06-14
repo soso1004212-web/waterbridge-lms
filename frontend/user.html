@@ -9,6 +9,19 @@
 
 <style>
 
+
+.online-badge{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#22c55e;
+  color:white;
+  padding:10px 14px;
+  border-radius:20px;
+  font-size:13px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.2);
+  z-index:9999;
+}
 *{
 margin:0;
 padding:0;
@@ -618,6 +631,15 @@ let userRef = null;
 window.userRef = null;
 window.currentUser = null;
 
+async function setOnlineStatus() {
+  if(!window.userRef) return;
+
+  await updateDoc(window.userRef, {
+    online: true,
+    lastSeen: Date.now()
+  });
+}
+
 onAuthStateChanged(auth, async (user) => {
 
   if(!user){
@@ -626,6 +648,16 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   window.currentUser = user;
+
+setInterval(() => {
+  if(window.userRef){
+    updateDoc(window.userRef, {
+      online: true,
+      lastSeen: Date.now()
+    });
+  }
+}, 10000);
+
 
   userRef = doc(db, "users", user.uid);
   window.userRef = userRef;
@@ -638,6 +670,15 @@ onAuthStateChanged(auth, async (user) => {
   }
 
  const data = snap.data();
+
+await setDoc(userRef, {
+  online: true,
+  lastSeen: Date.now()
+}, { merge: true });
+
+document.getElementById("onlineStatus").innerText = "🟢 온라인";
+
+
 applyCourseLock(data);
 
 renderCompletedCourses(data);
@@ -664,9 +705,19 @@ disableCompletedButtons(data);
 
 });
 
-</script>
+window.addEventListener("beforeunload", () => {
+  if(window.userRef){
+    setDoc(window.userRef, {
+      online: false,
+      lastSeen: Date.now()
+    }, { merge: true });
+  }
+});
 
 </script>
 
+<div class="online-badge" id="onlineStatus">
+  🔄 연결중...
+</div>
 </body>
 </html>

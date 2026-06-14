@@ -79,6 +79,23 @@ th{
   align-items:center;
   margin-bottom:20px;
 }
+
+/* 🔥 추가: 온라인 상태 스타일 */
+.status{
+  padding:4px 8px;
+  border-radius:6px;
+  font-size:12px;
+}
+
+.online{ background:#dcfce7; color:#16a34a; }
+.offline{ background:#fee2e2; color:#dc2626; }
+
+.user-row{
+  display:flex;
+  justify-content:space-between;
+  padding:10px;
+  border-bottom:1px solid #eee;
+}
 </style>
 </head>
 
@@ -89,11 +106,13 @@ th{
   <button onclick="logout()">로그아웃</button>
 </div>
 
+<!-- 관리자 상태 -->
 <div class="box">
   <h3>🔐 관리자 체크</h3>
   <p id="status">로딩중...</p>
 </div>
 
+<!-- 강의 추가 -->
 <div class="box">
   <h3>📚 강의 추가</h3>
   <input id="courseId" placeholder="courseId">
@@ -102,6 +121,7 @@ th{
   <button onclick="addCourse()">추가</button>
 </div>
 
+<!-- 유저 목록 -->
 <div class="box">
   <h3>👥 유저 목록</h3>
   <button onclick="loadUsers()">새로고침</button>
@@ -120,6 +140,12 @@ th{
   </table>
 </div>
 
+<!-- 🔥 추가: 실시간 접속자 -->
+<div class="box">
+  <h3>🔥 실시간 접속자</h3>
+  <div id="onlineUsers">로딩중...</div>
+</div>
+
 <script type="module">
 
 import { auth, db } from "./firebase-config.js";
@@ -134,12 +160,15 @@ import {
   getDocs,
   doc,
   getDoc,
-  setDoc
+  setDoc,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 /* -------------------------
    로그인 + 관리자 체크
 --------------------------*/
+let currentAdmin = null;
+
 onAuthStateChanged(auth, async (user) => {
 
   if(!user){
@@ -161,8 +190,12 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
+  currentAdmin = user;
+
   document.getElementById("status").innerHTML =
     "✅ 관리자 로그인: " + (data.name || user.email);
+
+  startOnlineListener(); // 🔥 접속자 실시간 시작
 });
 
 
@@ -193,10 +226,6 @@ window.addCourse = async function(){
   });
 
   alert("강의 추가 완료");
-
-  document.getElementById("courseId").value = "";
-  document.getElementById("title").value = "";
-  document.getElementById("desc").value = "";
 };
 
 
@@ -229,6 +258,58 @@ window.loadUsers = async function(){
     `;
   });
 };
+
+
+/* -------------------------
+   🔥 실시간 접속자 (추가 핵심)
+--------------------------*/
+function startOnlineListener(){
+
+  const box = document.getElementById("onlineUsers");
+
+  onSnapshot(collection(db,"users"), (snap) => {
+
+    box.innerHTML = "";
+
+    let count = 0;
+
+    snap.forEach(docu => {
+      const u = docu.data();
+
+      const isOnline = u.online === true;
+
+      if(isOnline) count++;
+
+      if(isOnline){
+        const div = document.createElement("div");
+        div.className = "user-row";
+
+        div.innerHTML = `
+          <div>
+            <b>${u.name || "이름 없음"}</b><br>
+            <small>${u.email || ""}</small>
+          </div>
+
+          <div>
+            <span class="status online">ONLINE</span><br>
+            <small>${u.lastSeen ? new Date(u.lastSeen).toLocaleTimeString() : "-"}</small>
+          </div>
+        `;
+
+        box.appendChild(div);
+      }
+    });
+
+    if(count === 0){
+      box.innerHTML = "현재 접속자 없음";
+    } else {
+      box.innerHTML =
+        `<div style="margin-bottom:10px;font-weight:bold;">
+          현재 접속자: ${count}명
+        </div>` + box.innerHTML;
+    }
+  });
+}
 
 </script>
 
