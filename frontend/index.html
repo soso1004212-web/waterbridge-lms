@@ -180,13 +180,13 @@ window.login = async () => {
 
   // 🔥 1차 방어
   if (!email || !password) {
-    document.getElementById("msg").innerText = "이메일/비밀번호 입력 필요";
+    document.getElementById("msg").innerText = "이메일 및 비밀번호를 입력해주세요.";
     return;
   }
 
   // 🔥 이메일 형식 체크 (핵심)
   if (!email.includes("@")) {
-    document.getElementById("msg").innerText = "이메일 형식이 잘못됨";
+    document.getElementById("msg").innerText = "이메일 형식이 잘못됐습니다.";
     return;
   }
 
@@ -247,7 +247,7 @@ window.resetPassword = async () => {
 const email = document.getElementById("loginEmail").value;
 
 if(!email){
-document.getElementById("msg").innerText = "이메일 입력 필요";
+document.getElementById("msg").innerText = "이메일 입력해주세요.";
 return;
 }
 

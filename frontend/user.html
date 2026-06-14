@@ -217,22 +217,22 @@ WaterBridge LMS
 
 <div class="card">
 <h3>수강 강의</h3>
-<div class="value">12</div>
+<div class="value" id="totalCourses">0</div>
 </div>
 
 <div class="card">
 <h3>완료 강의</h3>
-<div class="value">7</div>
+<div class="value" id="completedCourses">0</div>
 </div>
 
 <div class="card">
 <h3>수강률</h3>
-<div class="value">65%</div>
+<div class="value" id="progressValue">0%</div>
 </div>
 
 <div class="card">
 <h3>포인트</h3>
-<div class="value">3,200</div>
+<div class="value" id="pointValue">0</div>
 </div>
 
 </div>
@@ -241,9 +241,9 @@ WaterBridge LMS
 
 <h2>내 정보</h2>
 
-<p><strong>이름 :</strong> 홍길동</p>
-<p><strong>등급 :</strong> 프리미엄 회원</p>
-<p><strong>이메일 :</strong> user@test.com</p>
+<p><strong>이름 :</strong> <span id="userName">로딩중...</span></p>
+<p><strong>등급 :</strong> <span id="userGrade">로딩중...</span></p>
+<p><strong>이메일 :</strong> <span id="userEmail">로딩중...</span></p>
 
 </div>
 
@@ -357,26 +357,80 @@ onclick="closeVideo()">
 <script>
 
 function logout(){
-
-location.href="login.html";
-
+  location.href = "index.html";
 }
 
 function openVideo(url){
-
-document.getElementById("videoFrame").src=url;
-
-document.getElementById("videoModal").style.display="flex";
-
+  document.getElementById("videoFrame").src = url;
+  document.getElementById("videoModal").style.display = "flex";
 }
 
 function closeVideo(){
-
-document.getElementById("videoFrame").src="";
-
-document.getElementById("videoModal").style.display="none";
-
+  document.getElementById("videoFrame").src = "";
+  document.getElementById("videoModal").style.display = "none";
 }
+
+</script>
+
+<script type="module">
+
+import { auth, db } from "./firebase-config.js";
+
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+import {
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+onAuthStateChanged(auth, async (user) => {
+
+  if(!user){
+    location.href = "index.html";
+    return;
+  }
+
+  try{
+
+    const snap = await getDoc(
+      doc(db, "users", user.uid)
+    );
+
+    if(!snap.exists()){
+      console.log("회원정보 없음");
+      return;
+    }
+
+    const data = snap.data();
+
+    document.getElementById("userName").textContent =
+      data.name || "";
+
+    document.getElementById("userGrade").textContent =
+      data.grade || "";
+
+    document.getElementById("userEmail").textContent =
+      data.email || "";
+
+    document.getElementById("totalCourses").textContent =
+      data.totalCourses || 0;
+
+    document.getElementById("completedCourses").textContent =
+      data.completedCourses || 0;
+
+    document.getElementById("progressValue").textContent =
+      (data.progress || 0) + "%";
+
+    document.getElementById("pointValue").textContent =
+      (data.point || 0).toLocaleString();
+
+  }catch(err){
+    console.error(err);
+  }
+
+});
 
 </script>
 
