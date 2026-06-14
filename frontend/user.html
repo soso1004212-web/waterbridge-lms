@@ -194,20 +194,51 @@ padding:10px 15px;
 border-radius:8px;
 cursor:pointer;
 }
+.menu-btn{
+  display:none;
+  font-size:26px;
+  background:none;
+  border:none;
+  color:white;
+  cursor:pointer;
+}
 
+.nav{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+@media (max-width:768px){
+  .menu-btn{ display:block; }
+
+  .nav{
+    position:absolute;
+    top:70px;
+    right:0;
+    width:100%;
+    background:#0f172a;
+    flex-direction:column;
+    display:none;
+    padding:15px;
+  }
+
+  .nav.active{
+    display:flex;
+  }
+}
 </style>
 </head>
 <body>
 
 <div class="header">
 
-<div class="logo">
-WaterBridge LMS
-</div>
+  <div class="logo">WaterBridge LMS</div>
 
-<button class="logout" onclick="logout()">
-로그아웃
-</button>
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+  <div class="nav" id="navMenu">
+    <button class="logout" onclick="logout()">로그아웃</button>
+  </div>
 
 </div>
 
@@ -357,6 +388,9 @@ onclick="closeVideo()">
 <script>
 
 function logout(){
+function toggleMenu(){
+  document.getElementById("navMenu").classList.toggle("active");
+}
   location.href = "index.html";
 }
 
