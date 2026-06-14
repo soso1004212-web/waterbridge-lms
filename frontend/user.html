@@ -226,6 +226,22 @@ cursor:pointer;
     display:flex;
   }
 }
+.check-mark{
+  margin-left:8px;
+  color:#22c55e;
+  font-weight:900;
+  display:none;
+}
+
+.course-card.completed{
+  border:2px solid #22c55e;
+  background:#f0fdf4;
+}
+
+.course-card.completed .watch-btn{
+  background:#9ca3af;
+  cursor:not-allowed;
+}
 </style>
 </head>
 <body>
@@ -321,11 +337,12 @@ cursor:pointer;
 <div class="course-body">
 
 <div class="course-title">
-LMS 사용법 기초
+보이스피싱 기초편
+<span class="check-mark" id="check-lms_basic"></span>
 </div>
 
 <div class="course-desc">
-회원관리와 강의 수강 방법
+실전 전화방어
 </div>
 
 <button class="watch-btn"
@@ -346,11 +363,12 @@ onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ','lms_basic')">
 <div class="course-body">
 
 <div class="course-title">
-고급 투자 전략
+보이스피싱 중급편
+<span class="check-mark" id="check-invest_basic"></span>
 </div>
 
 <div class="course-desc">
-실전 자산관리 과정
+실전 자산방어
 </div>
 
 <button class="watch-btn"
@@ -397,6 +415,43 @@ function toggleMenu(){
 
 let currentCourseId = null;
 
+/* ✔ 표시 + 카드 상태 */
+function renderCompletedCourses(data){
+  const completed = data.completedCourseIds || [];
+
+  completed.forEach(id => {
+
+    const check = document.getElementById("check-" + id);
+    if(check){
+      check.textContent = "✔";
+      check.style.display = "inline-block";
+    }
+
+    const card = document.querySelector(`[data-course-id="${id}"]`);
+    if(card){
+      card.classList.add("completed");
+    }
+
+  });
+}
+
+/* 버튼 비활성화 */
+function disableCompletedButtons(data){
+  const completed = data.completedCourseIds || [];
+
+  completed.forEach(id => {
+    const card = document.querySelector(`[data-course-id="${id}"]`);
+    if(card){
+      const btn = card.querySelector(".watch-btn");
+      if(btn){
+        btn.textContent = "완료됨";
+        btn.disabled = true;
+      }
+    }
+  });
+}
+
+/* 영상 열기 */
 function openVideo(url, courseId){
   currentCourseId = courseId;
 
@@ -404,6 +459,7 @@ function openVideo(url, courseId){
   document.getElementById("videoModal").style.display = "flex";
 }
 
+/* 영상 닫기 + 완료 처리 */
 async function closeVideo(){
   document.getElementById("videoFrame").src = "";
   document.getElementById("videoModal").style.display = "none";
@@ -418,7 +474,7 @@ async function closeVideo(){
   const snap = await window.getDoc(userRef);
   const data = snap.data();
 
-  // 중복 방지
+  // 이미 완료면 종료
   if(data.completedCourseIds?.includes(currentCourseId)){
     currentCourseId = null;
     return;
@@ -480,7 +536,10 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const data = snap.data();
+ const data = snap.data();
+
+renderCompletedCourses(data);
+disableCompletedButtons(data);
 
   document.getElementById("userName").textContent = data.name || "";
   document.getElementById("userGrade").textContent = data.grade || "";
