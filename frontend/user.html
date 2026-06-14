@@ -446,7 +446,7 @@ onclick="closeVideo()">
 </div>
 
 <script>
-ffunction logout(){
+function logout(){
   if(window.userRef){
     setDoc(window.userRef, {
       online: false,
@@ -673,52 +673,31 @@ window.setOnlineStatus = async function(courseId, courseTitles) {
 onAuthStateChanged(auth, async (user) => {
 
   if(!user){
-    // 이미 index면 다시 이동하지 않게 방지
-    if(!location.pathname.includes("index.html")){
-      location.replace("index.html");
-    }
+    location.replace("index.html");
     return;
   }
 
   window.currentUser = user;
+  window.userRef = doc(db, "users", user.uid);
 
-  // 이하 기존 로직 유지...
+  const snap = await getDoc(window.userRef);
+
+  if(!snap.exists()) return;
+
+  const data = snap.data();
+
+  await setDoc(window.userRef, {
+    online: true,
+    lastSeen: Date.now()
+  }, { merge: true });
+
+  document.getElementById("onlineStatus").innerText = "🟢 온라인";
+
+  applyCourseLock(data);
+  renderCompletedCourses(data);
+  disableCompletedButtons(data);
+
 });
-
-setInterval(() => {
-  if(window.userRef){
-    updateDoc(window.userRef, {
-      lastSeen: Date.now()
-    });
-  }
-}, 10000);
-
-
-  userRef = doc(db, "users", user.uid);
-  window.userRef = userRef;
-
-  const snap = await getDoc(userRef);
-
-  if(!snap.exists()){
-    console.log("회원정보 없음");
-    return;
-  }
-
- const data = snap.data();
-
-await setDoc(userRef, {
-  online: true,
-  lastSeen: Date.now()
-}, { merge: true });
-
-document.getElementById("onlineStatus").innerText = "🟢 온라인";
-
-
-applyCourseLock(data);
-
-renderCompletedCourses(data);
-disableCompletedButtons(data);
-
   document.getElementById("userName").textContent = data.name || "";
   document.getElementById("userGrade").textContent = data.grade || "";
   document.getElementById("userEmail").textContent = data.email || "";
