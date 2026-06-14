@@ -119,12 +119,22 @@ font-size:13px;
 <!-- 로그인만 -->
 <div class="input-group">
 <label>이메일</label>
-<input type="email" id="loginEmail" placeholder="example@email.com">
+<input
+  type="email"
+  id="loginEmail"
+  placeholder="example@email.com"
+  onkeypress="if(event.key==='Enter') login()"
+>
 </div>
 
 <div class="input-group">
 <label>비밀번호</label>
-<input type="password" id="loginPassword" placeholder="비밀번호">
+<input
+  type="password"
+  id="loginPassword"
+  placeholder="비밀번호"
+  onkeypress="if(event.key==='Enter') login()"
+>
 </div>
 
 <button class="btn login-btn" onclick="login()">로그인</button>
