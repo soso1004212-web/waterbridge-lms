@@ -76,9 +76,20 @@ cursor:pointer;
 margin-top:10px;
 }
 
-.login-btn{ background:#2563eb; color:white; }
-.signup-btn{ background:#10b981; color:white; }
-.reset-btn{ background:#f59e0b; color:white; }
+.login-btn{
+background:#2563eb;
+color:white;
+}
+
+.signup-btn{
+background:#10b981;
+color:white;
+}
+
+.reset-btn{
+background:#f59e0b;
+color:white;
+}
 
 .msg{
 margin-top:15px;
@@ -98,28 +109,38 @@ font-size:13px;
 
 <body>
 
-<!-- 로그인 UI -->
-<div class="container" id="loginBox">
+<div class="container">
 
 <div class="logo">
 <h1>WaterBridge LMS</h1>
 <p>회원 로그인</p>
 </div>
 
+<!-- 로그인만 -->
 <div class="input-group">
 <label>이메일</label>
-<input type="email" id="loginEmail" placeholder="example@email.com"
-onkeypress="if(event.key==='Enter') login()">
+<input
+  type="email"
+  id="loginEmail"
+  placeholder="example@email.com"
+  onkeypress="if(event.key==='Enter') login()"
+>
 </div>
 
 <div class="input-group">
 <label>비밀번호</label>
-<input type="password" id="loginPassword" placeholder="비밀번호"
-onkeypress="if(event.key==='Enter') login()">
+<input
+  type="password"
+  id="loginPassword"
+  placeholder="비밀번호"
+  onkeypress="if(event.key==='Enter') login()"
+>
 </div>
 
 <button class="btn login-btn" onclick="login()">로그인</button>
+
 <button class="btn signup-btn" onclick="goSignup()">회원가입</button>
+
 <button class="btn reset-btn" onclick="resetPassword()">비밀번호 찾기</button>
 
 <div class="msg" id="msg"></div>
@@ -143,7 +164,7 @@ import {
   getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-/* Firebase */
+/* ---------------- Firebase ---------------- */
 const firebaseConfig = {
   apiKey: "AIzaSyDMn3t5QHpOSVqdAXsf8Bbh5TwXPqYIfpg",
   authDomain: "waterbridge-lms.firebaseapp.com",
@@ -159,7 +180,6 @@ const db = getFirestore(app);
 
 /* ---------------- LOGIN ---------------- */
 window.login = async () => {
-
   const email = document.getElementById("loginEmail").value.trim();
   const password = document.getElementById("loginPassword").value;
 
@@ -181,24 +201,20 @@ window.login = async () => {
 
     const snap = await getDoc(doc(db, "users", user.uid));
 
-    let role = "user";
-    let name = user.email;
-
-    if (snap.exists()) {
-      const data = snap.data();
-      role = data.role || "user";
-      name = data.name || user.email;
-    }
-
-    // 🔥 핵심: 먼저 저장
-    sessionStorage.setItem("role", role);
-    sessionStorage.setItem("name", name);
-
-    // 🔥 index로 이동 (SPA 구조)
+    // 🔥 핵심: URL 이동 금지 → index로만 이동
     location.href = "/";
 
-  } catch (e) {
+    // role 저장 (sessionStorage로 앱처럼 사용)
+    if (snap.exists()) {
+      const data = snap.data();
 
+      sessionStorage.setItem("role", data.role || "user");
+      sessionStorage.setItem("name", data.name || user.email);
+    } else {
+      sessionStorage.setItem("role", "user");
+    }
+
+  } catch (e) {
     let msg = "로그인 오류";
 
     switch (e.code) {
@@ -215,14 +231,13 @@ window.login = async () => {
   }
 };
 
-/* ---------------- SIGNUP ---------------- */
+/* ---------------- SIGNUP PAGE ---------------- */
 window.goSignup = () => {
   location.href = "signup.html";
 };
 
 /* ---------------- RESET PASSWORD ---------------- */
 window.resetPassword = async () => {
-
   const email = document.getElementById("loginEmail").value;
 
   if (!email) {
