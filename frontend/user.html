@@ -616,6 +616,13 @@ await updateDoc(window.userRef, {
 
 <script type="module">
 
+
+onAuthStateChanged(auth, (user) => {
+  if(!user){
+    location.replace("index.html");
+  }
+});
+
 import { auth, db } from "./firebase-config.js";
 
 import {
@@ -722,6 +729,10 @@ window.addEventListener("beforeunload", () => {
       online: false,
       lastSeen: Date.now()
     }, { merge: true });
+});
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted) {
+    location.reload();
   }
 });
 
