@@ -196,17 +196,44 @@ onAuthStateChanged(auth, async (user) => {
 
   currentAdmin = user;
 
+await setDoc(doc(db, "users", user.uid), {
+  online: true,
+  lastSeen: Date.now()
+}, { merge: true });
+
   document.getElementById("status").innerHTML =
     "✅ 관리자 로그인: " + (data.name || user.email);
 
   startOnlineListener(); // 🔥 접속자 실시간 시작
 });
-
+document.addEventListener("visibilitychange", async () => {
+  if (document.visibilityState === "hidden") {
+    await updateDoc(doc(db, "users", user.uid), {
+      online: false,
+      lastSeen: Date.now()
+    });
+  }
+});
 
 /* -------------------------
    로그아웃
 --------------------------*/
 window.logout = async function(){
+
+const user = auth.currentUser;
+
+  // 🔥 1. 온라인 상태 끄기 (핵심)
+  if (user) {
+    const { doc, updateDoc } = await import(
+      "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js"
+    );
+
+    await updateDoc(doc(db, "users", user.uid), {
+      online: false,
+      lastSeen: Date.now()
+    });
+  }
+
   await signOut(auth);
   location.replace("/index.html");
 };
