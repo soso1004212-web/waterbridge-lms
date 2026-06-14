@@ -446,17 +446,16 @@ onclick="closeVideo()">
 </div>
 
 <script>
-function logout(){
+async function logout(){
   if(window.userRef){
-    setDoc(window.userRef, {
+    await setDoc(window.userRef, {
       online: false,
       lastSeen: Date.now()
     }, { merge: true });
   }
 
-  location.replace("index.html"); // ✔ 중요
+  location.replace("index.html");
 }
-
 function toggleMenu(){
   document.getElementById("navMenu").classList.toggle("active");
 }
@@ -656,9 +655,13 @@ onAuthStateChanged(auth, async (user) => {
 
   window.userRef = doc(db, "users", user.uid);
 
-  const snap = await getDoc(window.userRef);
-  if (!snap.exists()) return;
+  // 🔥 추가: 로그인 즉시 온라인 처리
+  await setDoc(window.userRef, {
+    online: true,
+    lastSeen: Date.now()
+  }, { merge: true });
 
+  const snap = await getDoc(window.userRef);
   const data = snap.data();
 
   // ✅ 온라인 상태 표시
@@ -666,7 +669,6 @@ onAuthStateChanged(auth, async (user) => {
 
   // UI 업데이트
   document.getElementById("userName").textContent = data.name || "";
-  document.getElementById("userGrade").textContent = data.grade || "";
   document.getElementById("userEmail").textContent = data.email || "";
 
   document.getElementById("totalCourses").textContent = data.totalCourses || 0;
@@ -708,12 +710,15 @@ onAuthStateChanged(auth, async (user) => {
 
 });
 
-window.addEventListener("beforeunload", async () => {
+window.addEventListener("beforeunload", () => {
   if (window.userRef) {
-    await setDoc(window.userRef, {
-      online: false,
-      lastSeen: Date.now()
-    }, { merge: true });
+    navigator.sendBeacon(
+      "/offline",
+      JSON.stringify({
+        online: false,
+        lastSeen: Date.now()
+      })
+    );
   }
 });
 
