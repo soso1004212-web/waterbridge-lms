@@ -655,6 +655,7 @@ onAuthStateChanged(auth, async (user) => {
 
   window.userRef = doc(db, "users", user.uid);
 
+  // 🔥 추가: 로그인 즉시 온라인 처리
   await setDoc(window.userRef, {
     online: true,
     lastSeen: Date.now()
@@ -663,10 +664,11 @@ onAuthStateChanged(auth, async (user) => {
   const snap = await getDoc(window.userRef);
   const data = snap.data();
 
+  // ✅ 온라인 상태 표시
   document.getElementById("onlineStatus").innerText = "🟢 온라인";
 
+  // UI 업데이트
   document.getElementById("userName").textContent = data.name || "";
-  document.getElementById("userGrade").textContent = data.grade || "";
   document.getElementById("userEmail").textContent = data.email || "";
 
   document.getElementById("totalCourses").textContent = data.totalCourses || 0;
@@ -688,35 +690,20 @@ onAuthStateChanged(auth, async (user) => {
   renderCompletedCourses(data);
   disableCompletedButtons(data);
 });
-  document.getElementById("userGrade").textContent = data.grade || "";
-document.getElementById("userEmail").textContent = data.email || "";
 
-document.getElementById("totalCourses").textContent = data.totalCourses || 0;
-document.getElementById("completedCourses").textContent = data.completedCourses || 0;
+window.addEventListener("visibilitychange", async () => {
+  if (!window.userRef) return;
 
-const total = data.totalCourses || 1;
-const completed = data.completedCourses || 0;
-
-const progress = Math.round((completed / total) * 100);
-
-document.getElementById("progressValue").textContent = progress + "%";
-document.querySelector(".progress").style.width = progress + "%";
-document.querySelector(".progress-text").textContent = progress + "% 완료";
-
-document.getElementById("pointValue").textContent =
-  (data.point || 0).toLocaleString();
-
-});
-
-window.addEventListener("beforeunload", () => {
-  if (window.userRef) {
-    navigator.sendBeacon(
-      "/offline",
-      JSON.stringify({
-        online: false,
-        lastSeen: Date.now()
-      })
-    );
+  if (document.hidden) {
+    await updateDoc(window.userRef, {
+      online: false,
+      lastSeen: Date.now()
+    });
+  } else {
+    await setDoc(window.userRef, {
+      online: true,
+      lastSeen: Date.now()
+    }, { merge: true });
   }
 });
 
