@@ -72,11 +72,22 @@ th{
   background:#22c55e;
   color:white;
 }
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
 </style>
 </head>
+
 <body>
 
-<h1>⚙️ WaterBridge Admin Panel</h1>
+<div class="topbar">
+  <h1>⚙️ WaterBridge Admin Panel</h1>
+  <button onclick="logout()">로그아웃</button>
+</div>
 
 <div class="box">
   <h3>🔐 관리자 체크</h3>
@@ -114,7 +125,8 @@ th{
 import { auth, db } from "./firebase-config.js";
 
 import {
-  onAuthStateChanged
+  onAuthStateChanged,
+  signOut
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
 import {
@@ -131,14 +143,14 @@ import {
 onAuthStateChanged(auth, async (user) => {
 
   if(!user){
-    location.href = "index.html";
+    location.replace("/login");
     return;
   }
 
   const snap = await getDoc(doc(db,"users",user.uid));
 
   if(!snap.exists()){
-    document.getElementById("status").textContent = "유저 정보 없음";
+    document.body.innerHTML = "<h2>유저 정보 없음</h2>";
     return;
   }
 
@@ -150,8 +162,18 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   document.getElementById("status").innerHTML =
-    "✅ 관리자 로그인: " + data.name;
+    "✅ 관리자 로그인: " + (data.name || user.email);
 });
+
+
+/* -------------------------
+   로그아웃
+--------------------------*/
+window.logout = async function(){
+  await signOut(auth);
+  location.replace("/login");
+};
+
 
 /* -------------------------
    강의 추가
@@ -171,7 +193,12 @@ window.addCourse = async function(){
   });
 
   alert("강의 추가 완료");
+
+  document.getElementById("courseId").value = "";
+  document.getElementById("title").value = "";
+  document.getElementById("desc").value = "";
 };
+
 
 /* -------------------------
    유저 목록
