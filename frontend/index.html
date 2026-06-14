@@ -159,6 +159,31 @@ signInWithEmailAndPassword,
 sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+onAuthStateChanged(auth, async (user) => {
+
+  if(!user){
+    return;
+  }
+
+  const snap = await getDoc(doc(db, "users", user.uid));
+
+  if(!snap.exists()){
+    alert("유저 정보 없음");
+    return;
+  }
+
+  const data = snap.data();
+
+  if(data.role === "admin"){
+    location.href = "admin.html";
+    return;
+  }
+
+  location.href = "lms.html";
+});
+
+</script>
+
 const firebaseConfig = {
 apiKey: "AIzaSyDMn3t5QHpOSVqdAXsf8Bbh5TwXPqYIfpg",
 authDomain: "waterbridge-lms.firebaseapp.com",
