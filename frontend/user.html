@@ -448,10 +448,10 @@ onclick="closeVideo()">
 <script>
 async function logout(){
   if(window.userRef){
-    await setDoc(window.userRef, {
+    await window.updateDoc(window.userRef, {
       online: false,
       lastSeen: Date.now()
-    }, { merge: true });
+    });
   }
 
   location.replace("index.html");
