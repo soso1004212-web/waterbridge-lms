@@ -242,6 +242,30 @@ cursor:pointer;
   background:#9ca3af;
   cursor:not-allowed;
 }
+.course-card.locked{
+  opacity:0.4;
+  pointer-events:none;
+  filter:grayscale(1);
+}
+
+.lock-badge{
+  font-size:12px;
+  color:#ef4444;
+  margin-top:5px;
+}
+.course-progress{
+  height:6px;
+  background:#e5e7eb;
+  border-radius:10px;
+  margin-top:10px;
+  overflow:hidden;
+}
+
+.course-progress-bar{
+  height:100%;
+  background:#22c55e;
+  width:0%;
+}
 </style>
 </head>
 <body>
@@ -354,7 +378,7 @@ onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ','lms_basic')">
 
 </div>
 
-<div class="course-card" data-course-id="invest_basic">
+<div class="course-card locked" data-course-id="invest_basic">
 
 <div class="course-thumbnail">
 📚
@@ -371,6 +395,7 @@ onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ','lms_basic')">
 실전 자산방어
 </div>
 
+<div class="lock-badge" id="resume-lms_basic"></div>
 <button class="watch-btn"
 onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ','invest_basic')">
 강의 시청
@@ -416,40 +441,10 @@ function toggleMenu(){
 let currentCourseId = null;
 let videoInterval = null;
 let currentTime = 0;
-function renderCompletedCourses(data){
-  const completed = data.completedCourseIds || [];
 
-  completed.forEach(id => {
-
-    const check = document.getElementById("check-" + id);
-    if(check){
-      check.textContent = "✔";
-      check.style.display = "inline-block";
-    }
-
-    const card = document.querySelector(`[data-course-id="${id}"]`);
-    if(card){
-      card.classList.add("completed");
-    }
-
-  });
-}
-function disableCompletedButtons(data){
-  const completed = data.completedCourseIds || [];
-
-  completed.forEach(id => {
-    const card = document.querySelector(`[data-course-id="${id}"]`);
-    if(card){
-      const btn = card.querySelector(".watch-btn");
-      if(btn){
-        btn.textContent = "완료됨";
-        btn.disabled = true;
-      }
-    }
-  });
-}
-
-/* ✔ 표시 + 카드 상태 */
+/* -------------------------
+   UI: 완료 표시
+--------------------------*/
 function renderCompletedCourses(data){
   const completed = data.completedCourseIds || [];
 
@@ -469,7 +464,9 @@ function renderCompletedCourses(data){
   });
 }
 
-/* 버튼 비활성화 */
+/* -------------------------
+   UI: 버튼 비활성화
+--------------------------*/
 function disableCompletedButtons(data){
   const completed = data.completedCourseIds || [];
 
@@ -485,7 +482,23 @@ function disableCompletedButtons(data){
   });
 }
 
-/* 영상 열기 */
+/* -------------------------
+   강의 잠금 (순차)
+--------------------------*/
+function applyCourseLock(data){
+
+  const completed = data.completedCourseIds || [];
+
+  const invest = document.querySelector(`[data-course-id="invest_basic"]`);
+
+  if(invest && !completed.includes("lms_basic")){
+    invest.classList.add("locked");
+  }
+}
+
+/* -------------------------
+   이어보기 + 영상 열기
+--------------------------*/
 function openVideo(url, courseId){
   currentCourseId = courseId;
 
@@ -501,35 +514,15 @@ function openVideo(url, courseId){
   });
 }
 
-/* 영상 닫기 + 완료 처리 */
-async function closeVideo(){
-  document.getElementById("videoFrame").src = "";
-  document.getElementById("videoModal").style.display = "none";
-clearInterval(videoInterval);
-
-  if(!currentCourseId) return;
-
-  const user = window.currentUser;
-  if(!user) return;
-
-  const userRef = window.userRef;
-
-  const snap = await window.getDoc(userRef);
-  const data = snap.data();
-
-  // 이미 완료면 종료
-  if(data.completedCourseIds?.includes(currentCourseId)){
-await window.updateDoc(userRef, {
-  [`videoProgress.${currentCourseId}`]: currentTime
-});
-    currentCourseId = null;
-    return;
-  }
+/* -------------------------
+   타이머 추적
+--------------------------*/
 function startTracking(){
 
   clearInterval(videoInterval);
 
   videoInterval = setInterval(() => {
+
     currentTime += 1;
 
     if(currentTime >= 480){
@@ -539,6 +532,9 @@ function startTracking(){
   }, 1000);
 }
 
+/* -------------------------
+   완료 처리
+--------------------------*/
 async function markAsCompleted(){
 
   if(!currentCourseId) return;
@@ -562,9 +558,26 @@ async function markAsCompleted(){
   renderCompletedCourses(data);
   disableCompletedButtons(data);
 }
+
+/* -------------------------
+   영상 닫기 + 진도 저장
+--------------------------*/
+async function closeVideo(){
+
+  document.getElementById("videoFrame").src = "";
+  document.getElementById("videoModal").style.display = "none";
+
+  clearInterval(videoInterval);
+
+  if(!currentCourseId) return;
+
+  const userRef = window.userRef;
+
+  const snap = await window.getDoc(userRef);
+  const data = snap.data();
+
   await window.updateDoc(userRef, {
-    completedCourseIds: window.arrayUnion(currentCourseId),
-    completedCourses: window.increment(1)
+    [`videoProgress.${currentCourseId}`]: currentTime
   });
 
   currentCourseId = null;
@@ -619,6 +632,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
  const data = snap.data();
+applyCourseLock(data);
 
 renderCompletedCourses(data);
 disableCompletedButtons(data);
