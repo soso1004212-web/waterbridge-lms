@@ -664,7 +664,6 @@ onAuthStateChanged(auth, async (user) => {
 setInterval(() => {
   if(window.userRef){
     updateDoc(window.userRef, {
-      online: true,
       lastSeen: Date.now()
     });
   }

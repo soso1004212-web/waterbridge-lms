@@ -332,7 +332,7 @@ function startOnlineListener(){
     snap.forEach(docu => {
       const u = docu.data();
 
-      const isOnline = u.online === true;
+      const isOnline = u.lastSeen && (Date.now() - u.lastSeen < 30000);
 
       if(isOnline) count++;
 
