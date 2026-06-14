@@ -151,138 +151,101 @@ font-size:13px;
 
 <!-- Firebase -->
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
-getAuth,
-signInWithEmailAndPassword,
-sendPasswordResetEmail
+  getAuth,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-onAuthStateChanged(auth, async (user) => {
+import {
+  getFirestore,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  if(!user){
-    return;
-  }
-
-  const snap = await getDoc(doc(db, "users", user.uid));
-
-  if(!snap.exists()){
-    alert("유저 정보 없음");
-    return;
-  }
-
-  const data = snap.data();
-
-  if(data.role === "admin"){
-    location.href = "admin.html";
-    return;
-  }
-
-  location.href = "lms.html";
-});
-
-</script>
-
+// Firebase config
 const firebaseConfig = {
-apiKey: "AIzaSyDMn3t5QHpOSVqdAXsf8Bbh5TwXPqYIfpg",
-authDomain: "waterbridge-lms.firebaseapp.com",
-projectId: "waterbridge-lms",
-storageBucket: "waterbridge-lms.appspot.com",
-messagingSenderId: "224313355988",
-appId: "1:224313355988:web:886787fb9402df4f8e9541"
+  apiKey: "AIzaSyDMn3t5QHpOSVqdAXsf8Bbh5TwXPqYIfpg",
+  authDomain: "waterbridge-lms.firebaseapp.com",
+  projectId: "waterbridge-lms",
+  storageBucket: "waterbridge-lms.appspot.com",
+  messagingSenderId: "224313355988",
+  appId: "1:224313355988:web:886787fb9402df4f8e9541"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 const ADMIN_EMAIL = "admin@waterbridge.com";
 
 window.login = async () => {
-
   const email = document.getElementById("loginEmail").value.trim();
   const password = document.getElementById("loginPassword").value;
 
-  // 🔥 1차 방어
   if (!email || !password) {
     document.getElementById("msg").innerText = "이메일 및 비밀번호를 입력해주세요.";
     return;
   }
 
-  // 🔥 이메일 형식 체크 (핵심)
-  if (!email.includes("@")) {
-    document.getElementById("msg").innerText = "이메일 형식이 잘못됐습니다.";
-    return;
-  }
-
   try {
+    const userCredential =
+      await signInWithEmailAndPassword(auth, email, password);
 
-const userCredential =
-  await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-if (!userCredential.user.emailVerified) {
+    if (!user.emailVerified) {
+      document.getElementById("msg").innerText = "이메일 인증 후 로그인해주세요.";
+      return;
+    }
 
-  document.getElementById("msg").innerText =
-    "이메일 인증 후 로그인해주세요.";
+    const snap = await getDoc(doc(db, "users", user.uid));
 
-  return;
-}
-    document.getElementById("msg").innerText = "로그인 성공";
+    if (snap.exists()) {
+      const data = snap.data();
 
-    if (email === ADMIN_EMAIL) {
-      location.href = "/admin.html";
+      if (data.role === "admin") {
+        location.href = "admin.html";
+      } else {
+        location.href = "user.html";
+      }
     } else {
-      location.href = "/user.html";
+      location.href = "user.html";
     }
 
   } catch (e) {
+    let msg = "로그인 오류";
 
-  let msg = "로그인 중 오류가 발생했습니다.";
+    switch (e.code) {
+      case "auth/user-not-found":
+        msg = "가입되지 않은 이메일입니다.";
+        break;
+      case "auth/wrong-password":
+      case "auth/invalid-credential":
+        msg = "비밀번호가 올바르지 않습니다.";
+        break;
+    }
 
-  switch(e.code){
-
-    case "auth/invalid-email":
-      msg = "올바른 이메일 형식이 아닙니다.";
-      break;
-
-    case "auth/user-not-found":
-      msg = "가입되지 않은 이메일입니다.";
-      break;
-
-    case "auth/wrong-password":
-    case "auth/invalid-credential":
-      msg = "이메일 또는 비밀번호가 올바르지 않습니다.";
-      break;
-
-    case "auth/too-many-requests":
-      msg = "로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.";
-      break;
+    document.getElementById("msg").innerText = msg;
   }
-
-  document.getElementById("msg").innerText = msg;
-}
 };
 
 window.goSignup = () => {
-  window.location.assign("signup.html");
+  location.href = "signup.html";
 };
 
 window.resetPassword = async () => {
+  const email = document.getElementById("loginEmail").value;
 
-const email = document.getElementById("loginEmail").value;
+  if (!email) {
+    document.getElementById("msg").innerText = "이메일 입력해주세요.";
+    return;
+  }
 
-if(!email){
-document.getElementById("msg").innerText = "이메일 입력해주세요.";
-return;
-}
-
-try{
-await sendPasswordResetEmail(auth,email);
-document.getElementById("msg").innerText = "메일 전송 완료";
-}catch(e){
-document.getElementById("msg").innerText = e.message;
-}
-
+  await sendPasswordResetEmail(auth, email);
+  document.getElementById("msg").innerText = "메일 전송 완료";
 };
 
 </script>
