@@ -299,10 +299,10 @@ cursor:pointer;
 <p>WaterBridge 투자 과정</p>
 
 <div class="progress-bar">
-<div class="progress"></div>
+  <div class="progress"></div>
 </div>
 
-<p style="margin-top:10px;">65% 완료</p>
+<p class="progress-text">0% 완료</p>
 
 </div>
 
@@ -312,7 +312,7 @@ cursor:pointer;
 
 <div class="course-grid">
 
-<div class="course-card">
+<div class="course-card" data-course-id="lms_basic">
 
 <div class="course-thumbnail">
 🎓
@@ -329,7 +329,7 @@ LMS 사용법 기초
 </div>
 
 <button class="watch-btn"
-onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ')">
+onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ','lms_basic')">
 강의 시청
 </button>
 
@@ -337,7 +337,7 @@ onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ')">
 
 </div>
 
-<div class="course-card">
+<div class="course-card" data-course-id="invest_basic">
 
 <div class="course-thumbnail">
 📚
@@ -354,7 +354,7 @@ onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ')">
 </div>
 
 <button class="watch-btn"
-onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ')">
+onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ','invest_basic')">
 강의 시청
 </button>
 
@@ -388,20 +388,48 @@ onclick="closeVideo()">
 <script>
 
 function logout(){
-function toggleMenu(){
-  document.getElementById("navMenu").classList.toggle("active");
-}
   location.href = "index.html";
 }
 
-function openVideo(url){
+function toggleMenu(){
+  document.getElementById("navMenu").classList.toggle("active");
+}
+
+let currentCourseId = null;
+
+function openVideo(url, courseId){
+  currentCourseId = courseId;
+
   document.getElementById("videoFrame").src = url;
   document.getElementById("videoModal").style.display = "flex";
 }
 
-function closeVideo(){
+async function closeVideo(){
   document.getElementById("videoFrame").src = "";
   document.getElementById("videoModal").style.display = "none";
+
+  if(!currentCourseId) return;
+
+  const user = window.currentUser;
+  if(!user) return;
+
+  const userRef = window.userRef;
+
+  const snap = await window.getDoc(userRef);
+  const data = snap.data();
+
+  // 중복 방지
+  if(data.completedCourseIds?.includes(currentCourseId)){
+    currentCourseId = null;
+    return;
+  }
+
+  await window.updateDoc(userRef, {
+    completedCourseIds: window.arrayUnion(currentCourseId),
+    completedCourses: window.increment(1)
+  });
+
+  currentCourseId = null;
 }
 
 </script>
@@ -416,8 +444,22 @@ import {
 
 import {
   doc,
-  getDoc
+  getDoc,
+  updateDoc,
+  setDoc,
+  arrayUnion,
+  increment
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+window.arrayUnion = arrayUnion;
+window.increment = increment;
+
+window.getDoc = getDoc;
+window.updateDoc = updateDoc;
+
+let userRef = null;
+window.userRef = null;
+window.currentUser = null;
 
 onAuthStateChanged(auth, async (user) => {
 
@@ -426,45 +468,42 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  try{
+  window.currentUser = user;
 
-    const snap = await getDoc(
-      doc(db, "users", user.uid)
-    );
+  userRef = doc(db, "users", user.uid);
+  window.userRef = userRef;
 
-    if(!snap.exists()){
-      console.log("회원정보 없음");
-      return;
-    }
+  const snap = await getDoc(userRef);
 
-    const data = snap.data();
-
-    document.getElementById("userName").textContent =
-      data.name || "";
-
-    document.getElementById("userGrade").textContent =
-      data.grade || "";
-
-    document.getElementById("userEmail").textContent =
-      data.email || "";
-
-    document.getElementById("totalCourses").textContent =
-      data.totalCourses || 0;
-
-    document.getElementById("completedCourses").textContent =
-      data.completedCourses || 0;
-
-    document.getElementById("progressValue").textContent =
-      (data.progress || 0) + "%";
-
-    document.getElementById("pointValue").textContent =
-      (data.point || 0).toLocaleString();
-
-  }catch(err){
-    console.error(err);
+  if(!snap.exists()){
+    console.log("회원정보 없음");
+    return;
   }
 
+  const data = snap.data();
+
+  document.getElementById("userName").textContent = data.name || "";
+  document.getElementById("userGrade").textContent = data.grade || "";
+  document.getElementById("userEmail").textContent = data.email || "";
+
+  document.getElementById("totalCourses").textContent = data.totalCourses || 0;
+  document.getElementById("completedCourses").textContent = data.completedCourses || 0;
+
+  const total = data.totalCourses || 1;
+  const completed = data.completedCourses || 0;
+
+  const progress = Math.round((completed / total) * 100);
+
+  document.getElementById("progressValue").textContent = progress + "%";
+  document.querySelector(".progress").style.width = progress + "%";
+  document.querySelector(".progress-text").textContent = progress + "% 완료";
+
+  document.getElementById("pointValue").textContent =
+    (data.point || 0).toLocaleString();
+
 });
+
+</script>
 
 </script>
 
