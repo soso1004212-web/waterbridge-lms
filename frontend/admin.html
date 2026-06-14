@@ -124,10 +124,6 @@ th{
 <!-- 유저 목록 -->
 <div class="box">
   <h3>👥 유저 목록</h3>
-<div class="box">
-  <h3>🎥 실시간 강의 시청 현황</h3>
-  <div id="liveCourses"></div>
-</div>
   <button onclick="loadUsers()">새로고침</button>
 
   <table>
@@ -142,6 +138,10 @@ th{
     </thead>
     <tbody id="userTable"></tbody>
   </table>
+</div>
+<div class="box">
+  <h3>🎥 실시간 강의 시청 현황</h3>
+  <div id="liveCourses"></div>
 </div>
 
 <!-- 🔥 추가: 실시간 접속자 -->
@@ -198,7 +198,7 @@ onAuthStateChanged(auth, async (user) => {
 
   document.getElementById("status").innerHTML =
     "✅ 관리자 로그인: " + (data.name || user.email);
-startLiveWatching();
+
   startOnlineListener(); // 🔥 접속자 실시간 시작
 });
 
