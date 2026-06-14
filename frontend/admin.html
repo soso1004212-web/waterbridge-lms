@@ -143,7 +143,7 @@ import {
 onAuthStateChanged(auth, async (user) => {
 
   if(!user){
-    location.replace("/login");
+    location.replace("/index.html");
     return;
   }
 
@@ -171,7 +171,7 @@ onAuthStateChanged(auth, async (user) => {
 --------------------------*/
 window.logout = async function(){
   await signOut(auth);
-  location.replace("/login");
+  location.replace("/index.html");
 };
 
 
