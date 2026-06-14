@@ -446,7 +446,7 @@ onclick="closeVideo()">
 </div>
 
 <script>
-function logout(){
+ffunction logout(){
   if(window.userRef){
     setDoc(window.userRef, {
       online: false,
@@ -454,7 +454,7 @@ function logout(){
     }, { merge: true });
   }
 
-  location.href = "index.html";
+  location.replace("index.html"); // ✔ 중요
 }
 
 function toggleMenu(){
@@ -673,11 +673,17 @@ window.setOnlineStatus = async function(courseId, courseTitles) {
 onAuthStateChanged(auth, async (user) => {
 
   if(!user){
-    location.href = "index.html";
+    // 이미 index면 다시 이동하지 않게 방지
+    if(!location.pathname.includes("index.html")){
+      location.replace("index.html");
+    }
     return;
   }
 
   window.currentUser = user;
+
+  // 이하 기존 로직 유지...
+});
 
 setInterval(() => {
   if(window.userRef){
