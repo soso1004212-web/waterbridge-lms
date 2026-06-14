@@ -229,7 +229,32 @@ try{
   }, 1000);
 
 }catch(err){
-  document.getElementById("msg").innerText = err.message;
+
+  let msg = "회원가입 중 오류가 발생했습니다.";
+
+  switch(err.code){
+
+    case "auth/email-already-in-use":
+      msg = "이미 가입된 이메일입니다.";
+      break;
+
+    case "auth/invalid-email":
+      msg = "올바른 이메일 형식이 아닙니다.";
+      break;
+
+    case "auth/weak-password":
+      msg = "비밀번호는 6자리 이상 입력해주세요.";
+      break;
+
+    case "auth/network-request-failed":
+      msg = "인터넷 연결을 확인해주세요.";
+      break;
+
+    default:
+      console.error(err);
+  }
+
+  document.getElementById("msg").innerText = msg;
 }
 
 };
