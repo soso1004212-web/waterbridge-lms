@@ -6,168 +6,218 @@
 <meta http-equiv="Expires" content="0">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WaterBridge LMS 로그인</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+<title>WaterBridge LMS | 로그인</title>
+<meta name="description" content="WaterBridge LMS 학습자 로그인 페이지">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Pretendard',sans-serif;
+:root{
+  --bg:#07111f;
+  --panel:#ffffff;
+  --primary:#2563eb;
+  --primary-dark:#1d4ed8;
+  --green:#10b981;
+  --orange:#f59e0b;
+  --red:#ef4444;
+  --text:#0f172a;
+  --muted:#64748b;
+  --line:#e2e8f0;
+  --soft:#f8fafc;
+  --shadow:0 28px 80px rgba(2,8,23,.35);
 }
-
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard',system-ui,-apple-system,BlinkMacSystemFont,sans-serif;}
 body{
-background:#0f172a;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
+  min-height:100vh;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 12% 15%, rgba(37,99,235,.35), transparent 30%),
+    radial-gradient(circle at 85% 20%, rgba(16,185,129,.25), transparent 28%),
+    linear-gradient(135deg,#07111f 0%,#0f172a 58%,#111827 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:32px;
+  overflow-x:hidden;
 }
-
-.container{
-width:100%;
-max-width:420px;
-background:white;
-padding:40px;
-border-radius:20px;
-box-shadow:0 20px 50px rgba(0,0,0,.2);
+.bg-grid{
+  position:fixed;inset:0;pointer-events:none;opacity:.18;
+  background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);
+  background-size:54px 54px;
 }
-
-.logo{
-text-align:center;
-margin-bottom:30px;
+.page{
+  width:min(1180px,100%);
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  min-height:720px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:34px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  backdrop-filter:blur(18px);
 }
-
-.logo h1{
-font-size:30px;
-color:#2563eb;
+.hero{
+  position:relative;
+  padding:54px;
+  color:white;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
 }
-
-.logo p{
-color:#666;
-margin-top:5px;
+.brand{display:flex;align-items:center;gap:14px;font-weight:800;font-size:22px;letter-spacing:-.4px;}
+.brand-icon{
+  width:46px;height:46px;border-radius:16px;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg,#3b82f6,#22c55e);
+  box-shadow:0 16px 35px rgba(37,99,235,.35);
 }
-
-.input-group{
-margin-bottom:15px;
+.hero h1{font-size:54px;line-height:1.08;letter-spacing:-2.4px;margin:90px 0 20px;max-width:610px;}
+.hero p{font-size:18px;line-height:1.75;color:#cbd5e1;max-width:560px;}
+.hero-badges{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px;}
+.badge{padding:11px 14px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);font-size:14px;color:#e5e7eb;}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:52px;}
+.stat{padding:20px;border-radius:22px;background:rgba(15,23,42,.58);border:1px solid rgba(255,255,255,.12);}
+.stat strong{display:block;font-size:26px;margin-bottom:6px;}
+.stat span{font-size:13px;color:#cbd5e1;}
+.login-wrap{
+  background:linear-gradient(180deg,#fff,#f8fafc);
+  padding:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
-
-.input-group label{
-display:block;
-margin-bottom:6px;
-font-weight:600;
+.card{width:100%;max-width:430px;}
+.card-top{margin-bottom:30px;}
+.kicker{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:13px;font-weight:700;margin-bottom:18px;}
+.card h2{font-size:34px;letter-spacing:-1.2px;margin-bottom:10px;}
+.card-desc{color:var(--muted);line-height:1.6;font-size:15px;}
+.form-group{margin-bottom:18px;}
+.form-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:14px;font-weight:700;}
+.input-box{position:relative;}
+.input-box input{
+  width:100%;height:54px;border:1px solid var(--line);border-radius:16px;background:white;color:var(--text);
+  padding:0 48px 0 16px;font-size:15px;outline:none;transition:.2s;
 }
-
-.input-group input{
-width:100%;
-padding:14px;
-border:1px solid #ddd;
-border-radius:10px;
-font-size:15px;
+.input-box input:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(37,99,235,.12);}
+.input-icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:18px;}
+.password-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);border:none;background:#f1f5f9;color:#475569;border-radius:10px;padding:7px 9px;cursor:pointer;font-size:12px;font-weight:800;}
+.options{display:flex;justify-content:space-between;align-items:center;margin:4px 0 20px;gap:12px;font-size:14px;color:#475569;}
+.check{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
+.check input{width:16px;height:16px;accent-color:var(--primary);}
+.link-btn{border:none;background:none;color:var(--primary);font-weight:800;cursor:pointer;font-size:14px;}
+.btn{width:100%;height:54px;border:none;border-radius:16px;font-size:16px;font-weight:800;cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.login-btn{background:linear-gradient(135deg,var(--primary),#1d4ed8);color:white;box-shadow:0 14px 28px rgba(37,99,235,.24);}
+.login-btn:hover{transform:translateY(-1px);box-shadow:0 18px 32px rgba(37,99,235,.30);}
+.login-btn:disabled{opacity:.7;cursor:not-allowed;transform:none;}
+.sub-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
+.secondary{background:#ecfdf5;color:#047857;border:1px solid #bbf7d0;}
+.warning{background:#fffbeb;color:#b45309;border:1px solid #fde68a;}
+.msg{min-height:22px;margin-top:16px;text-align:center;font-size:14px;font-weight:800;line-height:1.45;}
+.msg.error{color:var(--red)}.msg.success{color:#059669}.msg.info{color:var(--primary)}
+.notice{margin-top:24px;padding:16px;border-radius:18px;background:#f1f5f9;border:1px solid var(--line);font-size:13px;color:#475569;line-height:1.6;}
+.security{display:flex;gap:10px;align-items:flex-start;margin-top:20px;color:#64748b;font-size:13px;line-height:1.55;}
+.footer{margin-top:28px;color:#94a3b8;font-size:13px;text-align:center;}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.45);border-top-color:white;border-radius:50%;animation:spin .8s linear infinite;display:none;}
+.loading .spinner{display:block;}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (max-width:920px){
+  body{padding:18px;align-items:flex-start;}
+  .page{grid-template-columns:1fr;min-height:auto;border-radius:26px;}
+  .hero{padding:34px;min-height:430px;}
+  .hero h1{font-size:38px;margin:52px 0 16px;}
+  .stats{margin-top:34px;}
+  .login-wrap{padding:34px 22px;}
 }
-
-.btn{
-width:100%;
-padding:15px;
-border:none;
-border-radius:10px;
-font-size:16px;
-font-weight:600;
-cursor:pointer;
-margin-top:10px;
-}
-
-.login-btn{
-background:#2563eb;
-color:white;
-}
-
-.signup-btn{
-background:#10b981;
-color:white;
-}
-
-.reset-btn{
-background:#f59e0b;
-color:white;
-}
-
-.msg{
-margin-top:15px;
-text-align:center;
-font-size:14px;
-font-weight:600;
-}
-
-.footer{
-margin-top:20px;
-text-align:center;
-color:#888;
-font-size:13px;
+@media (max-width:560px){
+  .hero{padding:26px;}
+  .hero h1{font-size:31px;letter-spacing:-1.4px;}
+  .hero p{font-size:15px;}
+  .stats{grid-template-columns:1fr;}
+  .sub-actions{grid-template-columns:1fr;}
+  .card h2{font-size:29px;}
 }
 </style>
 </head>
-
 <body>
+<div class="bg-grid"></div>
+<main class="page" aria-label="WaterBridge LMS 로그인">
+  <section class="hero">
+    <div>
+      <div class="brand"><div class="brand-icon">🌉</div><span>WaterBridge LMS</span></div>
+      <h1>안전한 학습을 위한 프리미엄 교육 플랫폼</h1>
+      <p>교육 영상, 진도 관리, 퀴즈 평가, 학습 이력까지 하나의 시스템에서 관리하세요. 실제 운영 사이트처럼 깔끔하고 신뢰감 있는 로그인 화면입니다.</p>
+      <div class="hero-badges">
+        <span class="badge">실시간 학습 관리</span>
+        <span class="badge">강의 진도 저장</span>
+        <span class="badge">관리자/회원 분리</span>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><strong>100+</strong><span>퀴즈 문항 지원</span></div>
+      <div class="stat"><strong>24/7</strong><span>온라인 학습 환경</span></div>
+      <div class="stat"><strong>보안</strong><span>Firebase 인증 연동</span></div>
+    </div>
+  </section>
 
-<div class="container">
+  <section class="login-wrap">
+    <div class="card">
+      <div class="card-top">
+        <div class="kicker">● Secure Login</div>
+        <h2>로그인</h2>
+        <p class="card-desc">WaterBridge LMS 계정으로 접속하여 강의와 퀴즈 학습을 계속 진행하세요.</p>
+      </div>
 
-<div class="logo">
-<h1>WaterBridge LMS</h1>
-<p>회원 로그인</p>
-</div>
+      <form id="loginForm" autocomplete="on">
+        <div class="form-group">
+          <div class="form-label"><label for="loginEmail">이메일</label></div>
+          <div class="input-box">
+            <input type="email" id="loginEmail" placeholder="example@email.com" autocomplete="email" required>
+            <span class="input-icon">✉️</span>
+          </div>
+        </div>
 
-<!-- 로그인만 -->
-<div class="input-group">
-<label>이메일</label>
-<input
-  type="email"
-  id="loginEmail"
-  placeholder="example@email.com"
-  onkeypress="if(event.key==='Enter') login()"
->
-</div>
+        <div class="form-group">
+          <div class="form-label"><label for="loginPassword">비밀번호</label></div>
+          <div class="input-box">
+            <input type="password" id="loginPassword" placeholder="비밀번호를 입력하세요" autocomplete="current-password" required>
+            <button type="button" class="password-toggle" onclick="togglePassword()">보기</button>
+          </div>
+        </div>
 
-<div class="input-group">
-<label>비밀번호</label>
-<input
-  type="password"
-  id="loginPassword"
-  placeholder="비밀번호"
-  onkeypress="if(event.key==='Enter') login()"
->
-</div>
+        <div class="options">
+          <label class="check"><input type="checkbox" id="rememberEmail"> 이메일 저장</label>
+          <button type="button" class="link-btn" onclick="resetPassword()">비밀번호 찾기</button>
+        </div>
 
-<button class="btn login-btn" onclick="login()">로그인</button>
+        <button type="submit" class="btn login-btn" id="loginBtn"><span class="spinner"></span><span id="loginBtnText">로그인</span></button>
+      </form>
 
-<button class="btn signup-btn" onclick="goSignup()">회원가입</button>
+      <div class="sub-actions">
+        <button class="btn secondary" onclick="goSignup()">회원가입</button>
+        <button class="btn warning" onclick="resetPassword()">재설정 메일</button>
+      </div>
 
-<button class="btn reset-btn" onclick="resetPassword()">비밀번호 찾기</button>
+      <div class="msg" id="msg" role="status" aria-live="polite"></div>
 
-<div class="msg" id="msg"></div>
+      <div class="notice">
+        이메일 인증이 완료된 계정만 로그인할 수 있습니다. 관리자는 자동으로 관리자 페이지로, 일반 회원은 학습 페이지로 이동합니다.
+      </div>
 
-<div class="footer">© WaterBridge LMS</div>
+      <div class="security">
+        <span>🔒</span>
+        <p>로그인 정보는 Firebase Authentication을 통해 처리되며, 브라우저에는 비밀번호를 저장하지 않습니다.</p>
+      </div>
+      <div class="footer">© 2026 WaterBridge LMS. All rights reserved.</div>
+    </div>
+  </section>
+</main>
 
-</div>
-
-<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-import {
-  getFirestore,
-  doc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-/* ---------------- Firebase ---------------- */
 const firebaseConfig = {
   apiKey: "AIzaSyDMn3t5QHpOSVqdAXsf8Bbh5TwXPqYIfpg",
   authDomain: "waterbridge-lms.firebaseapp.com",
@@ -181,92 +231,130 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* ---------------- LOGIN ---------------- */
-window.login = async () => {
-  const email = document.getElementById("loginEmail").value.trim();
-  const password = document.getElementById("loginPassword").value;
+const $ = (id) => document.getElementById(id);
+const msg = $("msg");
+const loginBtn = $("loginBtn");
+const loginBtnText = $("loginBtnText");
+const savedEmail = localStorage.getItem("waterbridge_saved_email");
 
-  if (!email || !password) {
-    document.getElementById("msg").innerText = "이메일 및 비밀번호를 입력해주세요.";
-    return;
-  }
-
-  try {
-    const userCredential =
-      await signInWithEmailAndPassword(auth, email, password);
-
-    const user = userCredential.user;
-
-    if (!user.emailVerified) {
-      document.getElementById("msg").innerText = "이메일 인증 후 로그인해주세요.";
-      return;
-    }
-
-    const snap = await getDoc(doc(db, "users", user.uid));
-
-if (snap.exists()) {
-  const data = snap.data();
-  sessionStorage.setItem("role", data.role || "user");
-  sessionStorage.setItem("name", data.name || user.email);
-} else {
-  sessionStorage.setItem("role", "user");
+if(savedEmail){
+  $("loginEmail").value = savedEmail;
+  $("rememberEmail").checked = true;
 }
-if (snap.exists()) {
-  const data = snap.data();
 
+function setMessage(text, type="info"){
+  msg.textContent = text;
+  msg.className = "msg " + type;
+}
+
+function setLoading(isLoading){
+  loginBtn.disabled = isLoading;
+  loginBtn.classList.toggle("loading", isLoading);
+  loginBtnText.textContent = isLoading ? "로그인 중..." : "로그인";
+}
+
+function validEmail(email){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+window.togglePassword = () => {
+  const input = $("loginPassword");
+  const btn = document.querySelector(".password-toggle");
+  const show = input.type === "password";
+  input.type = show ? "text" : "password";
+  btn.textContent = show ? "숨김" : "보기";
+};
+
+async function moveByRole(user){
+  const userDoc = doc(db, "users", user.uid);
+  const snap = await getDoc(userDoc);
+  const data = snap.exists() ? snap.data() : {};
   const role = data.role || "user";
 
   sessionStorage.setItem("role", role);
   sessionStorage.setItem("name", data.name || user.email);
+  sessionStorage.setItem("email", user.email || "");
 
-  // ✅ 여기 추가 (페이지 이동)
-  if (role === "admin") {
-    window.location.href = "admin.html";
-  } else {
-    window.location.href = "user.html";
-  }
+  await setDoc(userDoc, {
+    email: user.email || data.email || "",
+    online: true,
+    lastSeen: Date.now()
+  }, { merge: true });
 
-} else {
-  sessionStorage.setItem("role", "user");
-
-  // 기본 이동
-  window.location.href = "user.html";
+  window.location.replace(role === "admin" ? "admin.html" : "user.html");
 }
-  } catch (e) {
-    let msg = "로그인 오류";
 
-    switch (e.code) {
-      case "auth/user-not-found":
-        msg = "가입되지 않은 이메일입니다.";
-        break;
-      case "auth/wrong-password":
-      case "auth/invalid-credential":
-        msg = "비밀번호가 올바르지 않습니다.";
-        break;
-    }
+window.login = async () => {
+  const email = $("loginEmail").value.trim();
+  const password = $("loginPassword").value;
 
-    document.getElementById("msg").innerText = msg;
+  if(!email || !password){
+    setMessage("이메일과 비밀번호를 모두 입력해주세요.", "error");
+    return;
   }
-};
-
-/* ---------------- SIGNUP PAGE ---------------- */
-window.goSignup = () => {
-  location.href = "signup.html";
-};
-
-/* ---------------- RESET PASSWORD ---------------- */
-window.resetPassword = async () => {
-  const email = document.getElementById("loginEmail").value;
-
-  if (!email) {
-    document.getElementById("msg").innerText = "이메일 입력해주세요.";
+  if(!validEmail(email)){
+    setMessage("올바른 이메일 형식으로 입력해주세요.", "error");
     return;
   }
 
-  await sendPasswordResetEmail(auth, email);
-  document.getElementById("msg").innerText = "메일 전송 완료";
-};
-</script>
+  try{
+    setLoading(true);
+    setMessage("계정 정보를 확인하고 있습니다.", "info");
 
+    const credential = await signInWithEmailAndPassword(auth, email, password);
+    const user = credential.user;
+
+    if(!user.emailVerified){
+      setMessage("이메일 인증 후 로그인해주세요. 받은 메일함을 확인해주세요.", "error");
+      setLoading(false);
+      return;
+    }
+
+    if($("rememberEmail").checked){
+      localStorage.setItem("waterbridge_saved_email", email);
+    }else{
+      localStorage.removeItem("waterbridge_saved_email");
+    }
+
+    setMessage("로그인 성공. 페이지로 이동합니다.", "success");
+    await moveByRole(user);
+  }catch(e){
+    const code = e?.code || "";
+    let text = "로그인 중 오류가 발생했습니다.";
+    if(code === "auth/user-not-found") text = "가입되지 않은 이메일입니다.";
+    if(code === "auth/wrong-password" || code === "auth/invalid-credential") text = "이메일 또는 비밀번호가 올바르지 않습니다.";
+    if(code === "auth/too-many-requests") text = "로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.";
+    if(code === "auth/network-request-failed") text = "네트워크 연결을 확인해주세요.";
+    setMessage(text, "error");
+    setLoading(false);
+  }
+};
+
+window.goSignup = () => { window.location.href = "signup.html"; };
+
+window.resetPassword = async () => {
+  const email = $("loginEmail").value.trim();
+  if(!email){ setMessage("비밀번호 재설정을 받을 이메일을 먼저 입력해주세요.", "error"); return; }
+  if(!validEmail(email)){ setMessage("올바른 이메일 형식으로 입력해주세요.", "error"); return; }
+  try{
+    await sendPasswordResetEmail(auth, email);
+    setMessage("비밀번호 재설정 메일을 전송했습니다.", "success");
+  }catch(e){
+    setMessage("메일 전송에 실패했습니다. 이메일을 다시 확인해주세요.", "error");
+  }
+};
+
+$("loginForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  window.login();
+});
+
+onAuthStateChanged(auth, async (user) => {
+  if(user && user.emailVerified){
+    setMessage("이미 로그인된 계정이 있어 이동합니다.", "success");
+    await moveByRole(user);
+  }
+});
+</script>
 </body>
 </html>
