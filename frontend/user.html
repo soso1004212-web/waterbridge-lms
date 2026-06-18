@@ -1,288 +1,635 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-  <title>WaterBridge LMS</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-
-  <style>
-    :root{
-      --bg:#f6f8fc;
-      --surface:#ffffff;
-      --surface-2:#f8fafc;
-      --text:#0f172a;
-      --muted:#64748b;
-      --line:#e2e8f0;
-      --primary:#2563eb;
-      --primary-dark:#1e40af;
-      --success:#16a34a;
-      --danger:#dc2626;
-      --warning:#f59e0b;
-      --shadow:0 18px 45px rgba(15,23,42,.08);
-      --radius:22px;
-    }
-
-    *{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth}
-    body{
-      min-height:100vh;
-      font-family:'Pretendard',system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
-      background:
-        radial-gradient(circle at top left,rgba(37,99,235,.16),transparent 34rem),
-        linear-gradient(180deg,#eef4ff 0%,var(--bg) 34%,var(--bg) 100%);
-      color:var(--text);
-    }
-    button,input{font:inherit}
-    button{border:0;cursor:pointer}
-    a{color:inherit;text-decoration:none}
-
-    .app-shell{min-height:100vh;display:flex;flex-direction:column}
-
-    .topbar{
-      position:sticky;top:0;z-index:50;
-      height:76px;
-      display:flex;align-items:center;justify-content:space-between;gap:20px;
-      padding:0 clamp(18px,4vw,48px);
-      background:rgba(15,23,42,.92);
-      color:#fff;
-      backdrop-filter:blur(18px);
-      box-shadow:0 10px 30px rgba(15,23,42,.18);
-    }
-    .brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:22px;letter-spacing:-.03em}
-    .brand-mark{
-      width:42px;height:42px;border-radius:14px;
-      display:grid;place-items:center;
-      background:linear-gradient(135deg,#60a5fa,#2563eb 55%,#1e3a8a);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.3);
-    }
-    .nav{display:flex;align-items:center;gap:10px}
-    .nav a,.ghost-btn{
-      color:#e2e8f0;
-      padding:10px 14px;border-radius:12px;
-      background:transparent;
-      transition:.2s ease;
-    }
-    .nav a:hover,.ghost-btn:hover{background:rgba(255,255,255,.1);color:#fff}
-    .logout{background:#ef4444;color:white;padding:10px 16px;border-radius:12px;font-weight:700}
-    .menu-btn{display:none;background:transparent;color:white;font-size:28px}
-
-    .container{width:min(1440px,100%);margin:0 auto;padding:34px clamp(18px,4vw,48px) 80px}
-
-    .hero{
-      display:grid;grid-template-columns:1.4fr .8fr;gap:24px;align-items:stretch;margin-bottom:26px;
-    }
-    .hero-card,.panel,.stat-card,.course-card{
-      background:rgba(255,255,255,.9);
-      border:1px solid rgba(226,232,240,.9);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-    }
-    .hero-card{padding:34px;overflow:hidden;position:relative}
-    .hero-card::after{
-      content:"";position:absolute;right:-70px;top:-80px;width:260px;height:260px;border-radius:999px;
-      background:linear-gradient(135deg,rgba(37,99,235,.18),rgba(34,197,94,.16));
-    }
-    .eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--primary);font-weight:800;font-size:13px;background:#eff6ff;padding:8px 12px;border-radius:999px;margin-bottom:18px}
-    h1{font-size:clamp(30px,5vw,54px);line-height:1.05;letter-spacing:-.06em;margin-bottom:16px}
-    .hero p{color:var(--muted);font-size:17px;line-height:1.7;max-width:680px}
-    .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
-    .primary-btn,.secondary-btn{
-      display:inline-flex;align-items:center;justify-content:center;gap:8px;
-      padding:13px 18px;border-radius:14px;font-weight:800;transition:.2s ease;
-    }
-    .primary-btn{background:var(--primary);color:white}.primary-btn:hover{background:var(--primary-dark);transform:translateY(-1px)}
-    .secondary-btn{background:#f1f5f9;color:#0f172a}.secondary-btn:hover{background:#e2e8f0}
-
-    .profile-card{padding:24px;display:flex;flex-direction:column;justify-content:space-between;gap:20px}
-    .avatar{width:64px;height:64px;border-radius:22px;background:linear-gradient(135deg,#dbeafe,#bfdbfe);display:grid;place-items:center;font-size:32px}
-    .profile-card h2{font-size:22px;letter-spacing:-.03em;margin-top:12px}
-    .profile-row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
-    .profile-row strong{color:var(--text)}
-
-    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-bottom:24px}
-    .stat-card{padding:22px;position:relative;overflow:hidden}
-    .stat-card span{color:var(--muted);font-size:14px;font-weight:700}.stat-card b{display:block;font-size:32px;margin-top:8px;letter-spacing:-.04em;color:var(--primary)}
-    .stat-card small{display:block;color:var(--muted);margin-top:7px}
-
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}.panel{padding:26px}.panel h2{font-size:22px;margin-bottom:18px;letter-spacing:-.04em}.panel p{line-height:1.7;color:var(--muted)}
-    .notice-list{display:grid;gap:12px}.notice{padding:16px;border:1px solid var(--line);background:var(--surface-2);border-radius:16px;display:flex;gap:12px}.notice-icon{width:34px;height:34px;border-radius:12px;background:#dbeafe;display:grid;place-items:center;flex:0 0 auto}.notice strong{display:block;margin-bottom:4px}.notice small{color:var(--muted)}
-    .progress-wrap{display:grid;gap:14px}.progress-meta{display:flex;justify-content:space-between;color:var(--muted);font-weight:700}.progress-bar{height:14px;background:#e5e7eb;border-radius:999px;overflow:hidden}.progress{height:100%;width:0%;background:linear-gradient(90deg,var(--primary),var(--success));border-radius:999px;transition:width .4s ease}
-
-    .course-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:18px}.course-head h2{font-size:26px;letter-spacing:-.04em}.course-head p{color:var(--muted);margin-top:6px}
-    .course-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.course-card{overflow:hidden;transition:.2s ease}.course-card:hover{transform:translateY(-3px);box-shadow:0 22px 50px rgba(15,23,42,.12)}
-    .course-thumb{height:190px;background:linear-gradient(135deg,#dbeafe,#eef2ff);display:flex;align-items:center;justify-content:center;position:relative;font-size:54px}.badge{position:absolute;top:16px;left:16px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.82);font-size:12px;font-weight:800;color:#1e40af}.course-body{padding:22px}.course-title{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:20px;font-weight:800;letter-spacing:-.03em;margin-bottom:9px}.course-desc{color:var(--muted);line-height:1.6;margin-bottom:16px}.course-progress{height:8px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-bottom:16px}.course-progress-bar{height:100%;width:0%;background:var(--success);border-radius:999px;transition:width .3s ease}.watch-btn{width:100%;height:48px;border-radius:14px;background:var(--primary);color:white;font-weight:800}.watch-btn:hover{background:var(--primary-dark)}
-    .completed{border-color:rgba(22,163,74,.45);background:#f0fdf4}.completed .watch-btn{background:#94a3b8}.check-mark{color:var(--success)}.locked{opacity:.58;filter:grayscale(.4)}.locked .watch-btn{background:#94a3b8;cursor:not-allowed}.lock-text{margin-top:10px;color:var(--danger);font-size:13px;font-weight:800}
-
-    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,.78);z-index:100;padding:20px}.modal.active{display:flex}.video-box{width:min(980px,100%);background:white;border-radius:24px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.35)}.video-header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line)}.video-header h3{font-size:18px}.close-btn{width:38px;height:38px;border-radius:12px;background:#fee2e2;color:#991b1b;font-weight:900}.video-frame{width:100%;aspect-ratio:16/9;border:0;display:block;background:#020617}.video-footer{padding:16px 20px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-    .online-badge{position:fixed;right:20px;bottom:20px;z-index:80;background:#0f172a;color:white;border:1px solid rgba(255,255,255,.16);box-shadow:0 16px 35px rgba(15,23,42,.22);padding:11px 15px;border-radius:999px;font-size:13px;font-weight:800}
-    .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120px);background:#0f172a;color:white;padding:13px 18px;border-radius:999px;box-shadow:0 20px 50px rgba(15,23,42,.25);z-index:120;transition:.25s ease}.toast.show{transform:translateX(-50%) translateY(0)}
-    .quiz-section{margin-top:28px}
-    .quiz-layout{display:grid;grid-template-columns:.85fr 1.15fr;gap:20px;align-items:start}
-    .quiz-card{background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px}
-    .quiz-card h2{font-size:26px;letter-spacing:-.04em;margin-bottom:10px}
-    .quiz-sub{color:var(--muted);line-height:1.7;margin-bottom:18px}
-    .quiz-status{display:grid;gap:12px}
-    .quiz-stat{display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);color:var(--muted);font-weight:700}
-    .quiz-stat strong{color:var(--text)}
-    .quiz-box{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px}
-    .quiz-top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
-    .quiz-pill{display:inline-flex;align-items:center;gap:8px;background:#eff6ff;color:#1d4ed8;padding:8px 12px;border-radius:999px;font-size:13px;font-weight:900}
-    .quiz-question{font-size:22px;font-weight:900;line-height:1.45;letter-spacing:-.035em;margin-bottom:18px}
-    .quiz-options{display:grid;gap:10px}
-    .quiz-option{width:100%;text-align:left;padding:15px 16px;border:1px solid var(--line);border-radius:16px;background:#f8fafc;color:var(--text);font-weight:800;transition:.18s ease}
-    .quiz-option:hover{background:#eef2ff;border-color:#bfdbfe}
-    .quiz-option.correct{background:#dcfce7;border-color:#86efac;color:#166534}
-    .quiz-option.wrong{background:#fee2e2;border-color:#fecaca;color:#991b1b}
-    .quiz-option:disabled{cursor:not-allowed}
-    .quiz-feedback{margin-top:16px;padding:14px 16px;border-radius:16px;background:#f8fafc;color:var(--muted);line-height:1.6;border:1px solid var(--line);display:none}
-    .quiz-feedback.show{display:block}
-    .quiz-actions{display:flex;justify-content:space-between;gap:12px;margin-top:18px;flex-wrap:wrap}
-    .quiz-actions button{padding:12px 16px;border-radius:14px;font-weight:900}
-    .next-btn{background:var(--primary);color:#fff}.next-btn:disabled{background:#94a3b8;cursor:not-allowed}
-    .reset-btn{background:#f1f5f9;color:#334155}
-    @media(max-width:960px){.quiz-layout{grid-template-columns:1fr}}
-
-
-    @media(max-width:960px){.hero,.grid,.course-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:720px){.topbar{height:68px}.menu-btn{display:block}.nav{position:absolute;left:14px;right:14px;top:76px;display:none;flex-direction:column;align-items:stretch;background:#0f172a;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:12px}.nav.active{display:flex}.nav a,.ghost-btn,.logout{text-align:center;width:100%}.container{padding-top:22px}.hero-card,.panel,.profile-card{padding:22px}.stats{grid-template-columns:1fr}.course-thumb{height:160px}.online-badge{left:18px;right:auto}}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<title>WaterBridge LMS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#f5f6f8;
+  --panel:#fff;
+  --line:#d9dee7;
+  --line2:#edf0f4;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --primary:#1f4e8c;
+  --primary-dark:#173b6b;
+  --green:#15803d;
+  --red:#b91c1c;
+  --amber:#b45309;
+  --soft:#f9fafb;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  min-height:100vh;
+  font-family:'Pretendard',system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:14px;
+}
+a{color:inherit;text-decoration:none}
+button,input{font:inherit}
+button{border:0;cursor:pointer}
+.topbar{
+  height:58px;
+  background:#1f2937;
+  color:#fff;
+  border-bottom:1px solid #111827;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 28px;
+  position:sticky;
+  top:0;
+  z-index:50;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:700;
+  font-size:17px;
+}
+.brand-mark{
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+  border-radius:4px;
+  background:#fff;
+  color:#1f2937;
+  font-size:14px;
+  font-weight:800;
+}
+.nav{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+.nav a,.ghost-btn,.logout{
+  padding:8px 11px;
+  border-radius:4px;
+  background:transparent;
+  color:#e5e7eb;
+  font-weight:500;
+  font-size:13px;
+}
+.nav a:hover,.ghost-btn:hover{background:rgba(255,255,255,.08)}
+.logout{background:#374151}
+.logout:hover{background:#4b5563}
+.menu-btn{display:none;background:transparent;color:#fff;font-size:22px}
+.container{
+  width:min(1180px,100%);
+  margin:0 auto;
+  padding:28px 24px 60px;
+}
+.page-title{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:18px;
+}
+.page-title h1{
+  font-size:26px;
+  line-height:1.25;
+  letter-spacing:-.03em;
+  margin-bottom:7px;
+}
+.page-title p{color:var(--muted);line-height:1.55}
+.status-line{
+  color:#4b5563;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:10px 12px;
+  min-width:230px;
+  font-size:13px;
+}
+.status-line b{display:block;color:var(--text);margin-bottom:4px}
+.dashboard{
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  gap:16px;
+  margin-bottom:16px;
+}
+.panel,.stat-card,.course-card,.quiz-card,.quiz-box{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+}
+.panel{padding:20px}
+.panel h2{
+  font-size:18px;
+  margin-bottom:14px;
+}
+.profile-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+.profile-row{
+  border:1px solid var(--line2);
+  background:var(--soft);
+  border-radius:6px;
+  padding:12px;
+}
+.profile-row span{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:6px;
+}
+.profile-row strong{font-size:14px}
+.notice-list{display:grid;gap:8px}
+.notice{
+  border:1px solid var(--line2);
+  background:var(--soft);
+  border-radius:6px;
+  padding:12px;
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+}
+.notice-icon{
+  width:24px;
+  height:24px;
+  display:grid;
+  place-items:center;
+  border-radius:4px;
+  background:#e5e7eb;
+  flex:0 0 auto;
+}
+.notice strong{display:block;margin-bottom:3px}
+.notice small{color:var(--muted);line-height:1.5}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:16px;
+}
+.stat-card{
+  padding:16px;
+}
+.stat-card span{
+  color:var(--muted);
+  font-size:12px;
+  font-weight:600;
+}
+.stat-card b{
+  display:block;
+  font-size:24px;
+  margin-top:6px;
+  color:var(--text);
+}
+.stat-card small{
+  display:block;
+  color:var(--muted);
+  margin-top:5px;
+  font-size:12px;
+}
+.progress-wrap{display:grid;gap:10px}
+.progress-meta{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  color:#374151;
+  font-weight:600;
+}
+.progress-bar{
+  height:10px;
+  background:#e5e7eb;
+  border-radius:999px;
+  overflow:hidden;
+}
+.progress{
+  height:100%;
+  width:0%;
+  background:var(--primary);
+  transition:width .25s ease;
+}
+.section-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin:26px 0 12px;
+}
+.section-head h2{
+  font-size:20px;
+  margin-bottom:5px;
+}
+.section-head p{color:var(--muted);line-height:1.5}
+.course-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.course-card{
+  overflow:hidden;
+}
+.course-thumb{
+  height:74px;
+  background:#f3f4f6;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  font-size:26px;
+}
+.badge{
+  position:absolute;
+  top:10px;
+  left:10px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:4px 8px;
+  font-size:11px;
+  color:#374151;
+  font-weight:600;
+}
+.course-body{padding:16px}
+.course-title{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  font-weight:700;
+  font-size:16px;
+  margin-bottom:7px;
+}
+.course-desc{
+  color:var(--muted);
+  line-height:1.55;
+  min-height:42px;
+}
+.course-progress{
+  height:7px;
+  background:#e5e7eb;
+  border-radius:999px;
+  overflow:hidden;
+  margin:12px 0;
+}
+.course-progress-bar{
+  height:100%;
+  width:0%;
+  background:var(--green);
+}
+.watch-btn,.primary-btn,.secondary-btn,.next-btn,.reset-btn{
+  border-radius:5px;
+  padding:10px 12px;
+  font-weight:600;
+}
+.watch-btn{
+  width:100%;
+  background:var(--primary);
+  color:#fff;
+}
+.watch-btn:hover{background:var(--primary-dark)}
+.completed{
+  border-color:#bbf7d0;
+  background:#fbfefc;
+}
+.completed .watch-btn{background:#6b7280}
+.check-mark{color:var(--green)}
+.locked{
+  background:#f9fafb;
+  color:#6b7280;
+}
+.locked .watch-btn{
+  background:#9ca3af;
+  cursor:not-allowed;
+}
+.lock-text{
+  margin-top:8px;
+  color:var(--red);
+  font-size:12px;
+  font-weight:600;
+}
+.primary-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--primary);
+  color:#fff;
+}
+.primary-btn:disabled{background:#9ca3af;cursor:not-allowed}
+.secondary-btn,.reset-btn{
+  background:#f3f4f6;
+  color:#374151;
+  border:1px solid var(--line);
+}
+.quiz-section{margin-top:28px}
+.quiz-layout{
+  display:grid;
+  grid-template-columns:340px 1fr;
+  gap:14px;
+  align-items:start;
+}
+.quiz-card,.quiz-box{padding:18px}
+.quiz-card h2{font-size:18px;margin-bottom:8px}
+.quiz-sub{color:var(--muted);line-height:1.6;margin-bottom:14px}
+.quiz-status{border-top:1px solid var(--line2)}
+.quiz-stat{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  border-bottom:1px solid var(--line2);
+  padding:11px 0;
+  color:var(--muted);
+}
+.quiz-stat strong{color:var(--text)}
+.quiz-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:14px;
+}
+.quiz-pill{
+  display:inline-flex;
+  padding:6px 9px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:#f9fafb;
+  color:#374151;
+  font-size:12px;
+  font-weight:600;
+}
+.quiz-question{
+  font-size:18px;
+  line-height:1.45;
+  font-weight:700;
+  margin-bottom:14px;
+}
+.quiz-options{display:grid;gap:8px}
+.quiz-option{
+  width:100%;
+  text-align:left;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:12px;
+  font-weight:500;
+}
+.quiz-option:hover{background:#f9fafb}
+.quiz-option.correct{background:#ecfdf5;border-color:#86efac;color:#166534}
+.quiz-option.wrong{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+.quiz-option:disabled{cursor:not-allowed}
+.quiz-feedback{
+  margin-top:12px;
+  border:1px solid var(--line);
+  background:#f9fafb;
+  border-radius:6px;
+  padding:12px;
+  color:#4b5563;
+  line-height:1.55;
+  display:none;
+}
+.quiz-feedback.show{display:block}
+.quiz-actions{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:14px;
+}
+.next-btn{background:var(--primary);color:#fff}
+.next-btn:disabled{background:#9ca3af;cursor:not-allowed}
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(17,24,39,.72);
+  z-index:100;
+  padding:20px;
+}
+.modal.active{display:flex}
+.video-box{
+  width:min(920px,100%);
+  background:#fff;
+  border-radius:8px;
+  overflow:hidden;
+  border:1px solid var(--line);
+}
+.video-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:13px 16px;
+  border-bottom:1px solid var(--line);
+}
+.video-header h3{font-size:16px}
+.close-btn{
+  width:30px;
+  height:30px;
+  border-radius:4px;
+  background:#f3f4f6;
+  color:#111827;
+  font-size:18px;
+}
+.video-frame{
+  width:100%;
+  aspect-ratio:16/9;
+  border:0;
+  display:block;
+  background:#000;
+}
+.video-footer{
+  padding:12px 16px;
+  color:var(--muted);
+  font-size:13px;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.online-badge{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:12px;
+  color:#374151;
+  z-index:80;
+}
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:20px;
+  transform:translateX(-50%) translateY(80px);
+  background:#111827;
+  color:#fff;
+  border-radius:6px;
+  padding:10px 14px;
+  transition:.2s ease;
+  z-index:120;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+@media(max-width:900px){
+  .dashboard,.quiz-layout,.course-grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .profile-grid{grid-template-columns:1fr}
+  .page-title{display:block}
+  .status-line{margin-top:12px}
+}
+@media(max-width:640px){
+  .topbar{height:auto;padding:12px 16px;align-items:flex-start}
+  .menu-btn{display:block}
+  .nav{
+    position:absolute;
+    top:54px;
+    left:12px;
+    right:12px;
+    background:#1f2937;
+    border:1px solid #374151;
+    display:none;
+    flex-direction:column;
+    align-items:stretch;
+    padding:8px;
+  }
+  .nav.active{display:flex}
+  .nav a,.ghost-btn,.logout{width:100%;text-align:left}
+  .container{padding:20px 14px 50px}
+  .stats{grid-template-columns:1fr}
+  .quiz-actions{display:grid}
+}
+</style>
 </head>
 <body>
-  <div class="app-shell">
-    <header class="topbar">
-      <a class="brand" href="#" aria-label="WaterBridge LMS 홈">
-        <span class="brand-mark">💧</span><span>WaterBridge LMS</span>
-      </a>
-      <button class="menu-btn" type="button" aria-label="메뉴 열기" onclick="toggleMenu()">☰</button>
-      <nav class="nav" id="navMenu">
-        <a href="#dashboard">대시보드</a>
-        <a href="#courses">강의</a>
-        <a href="#quiz">100문항 퀴즈</a>
-        <button class="ghost-btn" type="button" onclick="scrollToContinue()">이어보기</button>
-        <button class="logout" type="button" onclick="logout()">로그아웃</button>
-      </nav>
-    </header>
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="WaterBridge LMS 홈">
+      <span class="brand-mark">W</span><span>WaterBridge LMS</span>
+    </a>
+    <button class="menu-btn" type="button" aria-label="메뉴 열기" onclick="toggleMenu()">☰</button>
+    <nav class="nav" id="navMenu">
+      <a href="#dashboard">대시보드</a>
+      <a href="#courses">강의</a>
+      <a href="#quiz">평가</a>
+      <button class="ghost-btn" type="button" onclick="scrollToContinue()">이어보기</button>
+      <button class="logout" type="button" onclick="logout()">로그아웃</button>
+    </nav>
+  </header>
 
-    <main class="container" id="dashboard">
-      <section class="hero">
-        <div class="hero-card">
-          <span class="eyebrow">⚡ 자산 행정 · 증권 실무 교육 플랫폼</span>
-          <h1>자산 행정 실무를 배우고<br />증권 기초부터 서류 검수까지 완성하세요.</h1>
-          <p>WaterBridge LMS는 자산 행정 매니저 업무에 필요한 증권 기초, 고객 응대, 서류 검수, 개인정보보호, 인수인계 절차를 단계별로 학습하는 실무 교육 플랫폼입니다.</p>
-          <div class="hero-actions">
-            <a class="primary-btn" href="#courses">강의 시작하기 →</a>
-            <button class="secondary-btn" type="button" onclick="scrollToContinue()">최근 학습 이어보기</button>
-          </div>
-        </div>
-
-        <aside class="profile-card" aria-label="내 정보">
-          <div>
-            <div class="avatar">👤</div>
-            <h2 id="userName">로딩중...</h2>
-            <p id="userEmail" style="color:var(--muted);margin-top:6px">로딩중...</p>
-          </div>
-          <div>
-            <div class="profile-row"><span>회원 등급</span><strong id="userGrade">일반</strong></div>
-            <div class="profile-row"><span>최근 접속</span><strong id="lastSeenText">방금 전</strong></div>
-            <div class="profile-row"><span>상태</span><strong id="profileOnline">연결중</strong></div>
-          </div>
-        </aside>
-      </section>
-
-      <section class="stats" aria-label="학습 통계">
-        <div class="stat-card"><span>수강 강의</span><b id="totalCourses">0</b><small>등록된 전체 강의</small></div>
-        <div class="stat-card"><span>완료 강의</span><b id="completedCourses">0</b><small>수강 완료 처리된 강의</small></div>
-        <div class="stat-card"><span>수강률</span><b id="progressValue">0%</b><small>전체 과정 기준</small></div>
-        <div class="stat-card"><span>포인트</span><b id="pointValue">0</b><small>학습 보상 포인트</small></div>
-      </section>
-
-      <section class="grid">
-        <div class="panel">
-          <h2>공지사항</h2>
-          <div class="notice-list">
-            <div class="notice"><span class="notice-icon">📢</span><div><strong>신규 강의 업로드</strong><small>자산 행정·증권 실무 8개 영상 과정과 100문항 평가가 준비되었습니다.</small></div></div>
-            <div class="notice"><span class="notice-icon">🛠️</span><div><strong>시스템 점검 안내</strong><small>6월 20일 새벽 2시부터 약 30분간 점검 예정입니다.</small></div></div>
-          </div>
-        </div>
-        <div class="panel">
-          <h2>내 학습 현황</h2>
-          <div class="progress-wrap">
-            <div class="progress-meta"><span>WaterBridge 자산 행정 실무 과정</span><span class="progress-text">0% 완료</span></div>
-            <div class="progress-bar"><div class="progress"></div></div>
-            <p>강의는 순서대로 잠금 해제되며, 최종 평가는 정답을 맞혀야 다음 문항으로 이동합니다.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="courses">
-        <div class="course-head">
-          <div>
-            <h2>강의 목록</h2>
-            <p>증권 기초부터 고객 방문·서류 검수·인수인계까지 단계별로 학습합니다.</p>
-          </div>
-        </div>
-        <div class="course-grid" id="courseGrid"></div>
-      </section>
-
-      <section class="quiz-section" id="quiz">
-        <div class="course-head">
-          <div>
-            <h2>100문항 최종 평가</h2>
-            <p>자산 행정·증권 실무 평가입니다. 정답을 맞혀야 다음 문항으로 넘어갑니다.</p>
-          </div>
-        </div>
-        <div class="quiz-layout">
-          <aside class="quiz-card">
-            <h2>평가 진행 현황</h2>
-            <p class="quiz-sub">증권 기초, 명의이전, 고객 응대, 서류 검수, 개인정보보호, 인수인계 절차를 100문항으로 점검합니다. 진행상황은 브라우저와 Firebase에 저장됩니다.</p>
-            <div class="quiz-status">
-              <div class="quiz-stat"><span>현재 문항</span><strong id="quizCurrentText">1 / 100</strong></div>
-              <div class="quiz-stat"><span>정답 수</span><strong id="quizScoreText">0개</strong></div>
-              <div class="quiz-stat"><span>완료율</span><strong id="quizPercentText">0%</strong></div>
-              <div class="quiz-stat"><span>수료 기준</span><strong>100문항 완료</strong></div>
-              <div class="quiz-stat"><span>평가 상태</span><strong id="quizPassText">진행중</strong></div>
-            </div>
-            <button class="primary-btn" id="certificateBtn" type="button" onclick="printCertificate()" style="width:100%;margin-top:18px" disabled>수료증 출력</button>
-          </aside>
-          <div class="quiz-box" aria-live="polite">
-            <div class="quiz-top">
-              <span class="quiz-pill" id="quizCategory">증권 기초</span>
-              <span class="quiz-pill" id="quizLockText">정답을 맞혀야 다음 문항 열림</span>
-            </div>
-            <div class="quiz-question" id="quizQuestion">문제를 불러오는 중입니다.</div>
-            <div class="quiz-options" id="quizOptions"></div>
-            <div class="quiz-feedback" id="quizFeedback"></div>
-            <div class="quiz-actions">
-              <button class="reset-btn" type="button" onclick="resetQuizProgress()">퀴즈 처음부터</button>
-              <button class="next-btn" id="quizNextBtn" type="button" onclick="goNextQuiz()" disabled>다음 문항 →</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-    </main>
-  </div>
-
-  <div class="modal" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="videoTitle">
-    <div class="video-box">
-      <div class="video-header">
-        <h3 id="videoTitle">강의 시청</h3>
-        <button class="close-btn" type="button" onclick="closeVideo()" aria-label="닫기">×</button>
+  <main class="container" id="dashboard">
+    <section class="page-title">
+      <div>
+        <h1>자산 행정 실무 교육</h1>
+        <p>강의 수강, 평가 진행, 학습 이력을 확인할 수 있습니다.</p>
       </div>
-      <iframe class="video-frame" id="videoFrame" title="강의 영상" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-      <div class="video-footer"><span id="watchTimeText">시청 시간 0초</span><span>영상 종료 또는 8분 시청 시 완료 처리됩니다.</span></div>
-    </div>
-  </div>
+      <div class="status-line">
+        <b id="profileOnline">연결 확인 중</b>
+        <span id="lastSeenText">최근 접속 정보를 불러오는 중입니다.</span>
+      </div>
+    </section>
 
-  <div class="online-badge" id="onlineStatus">🔄 연결중...</div>
-  <div class="toast" id="toast">저장되었습니다.</div>
+    <section class="dashboard">
+      <div class="panel">
+        <h2>내 정보</h2>
+        <div class="profile-grid">
+          <div class="profile-row"><span>이름</span><strong id="userName">로딩중...</strong></div>
+          <div class="profile-row"><span>이메일</span><strong id="userEmail">로딩중...</strong></div>
+          <div class="profile-row"><span>회원 등급</span><strong id="userGrade">일반</strong></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>공지사항</h2>
+        <div class="notice-list">
+          <div class="notice"><span class="notice-icon">i</span><div><strong>교육 과정 안내</strong><small>자산 행정·증권 실무 8개 강의와 최종 평가가 준비되어 있습니다.</small></div></div>
+          <div class="notice"><span class="notice-icon">!</span><div><strong>시스템 점검 안내</strong><small>점검 일정은 관리자 공지에 따라 변경될 수 있습니다.</small></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats" aria-label="학습 통계">
+      <div class="stat-card"><span>전체 강의</span><b id="totalCourses">0</b><small>등록된 과정</small></div>
+      <div class="stat-card"><span>완료 강의</span><b id="completedCourses">0</b><small>수강 완료</small></div>
+      <div class="stat-card"><span>수강률</span><b id="progressValue">0%</b><small>전체 과정 기준</small></div>
+      <div class="stat-card"><span>포인트</span><b id="pointValue">0</b><small>누적 포인트</small></div>
+    </section>
+
+    <section class="panel">
+      <h2>학습 현황</h2>
+      <div class="progress-wrap">
+        <div class="progress-meta"><span>WaterBridge 자산 행정 실무 과정</span><span class="progress-text">0% 완료</span></div>
+        <div class="progress-bar"><div class="progress"></div></div>
+        <p style="color:var(--muted);line-height:1.6">강의는 순서대로 진행되며, 이전 강의를 완료하면 다음 강의가 열립니다.</p>
+      </div>
+    </section>
+
+    <section id="courses">
+      <div class="section-head">
+        <div>
+          <h2>강의 목록</h2>
+          <p>증권 기초, 고객 응대, 서류 검수, 인수인계 절차를 단계별로 학습합니다.</p>
+        </div>
+      </div>
+      <div class="course-grid" id="courseGrid"></div>
+    </section>
+
+    <section class="quiz-section" id="quiz">
+      <div class="section-head">
+        <div>
+          <h2>최종 평가</h2>
+          <p>정답을 맞혀야 다음 문항으로 이동합니다.</p>
+        </div>
+      </div>
+      <div class="quiz-layout">
+        <aside class="quiz-card">
+          <h2>평가 진행 현황</h2>
+          <p class="quiz-sub">증권 기초, 명의이전, 고객 응대, 서류 검수, 개인정보보호, 인수인계 절차를 점검합니다.</p>
+          <div class="quiz-status">
+            <div class="quiz-stat"><span>현재 문항</span><strong id="quizCurrentText">1 / 100</strong></div>
+            <div class="quiz-stat"><span>정답 수</span><strong id="quizScoreText">0개</strong></div>
+            <div class="quiz-stat"><span>완료율</span><strong id="quizPercentText">0%</strong></div>
+            <div class="quiz-stat"><span>수료 기준</span><strong>100문항 완료</strong></div>
+            <div class="quiz-stat"><span>평가 상태</span><strong id="quizPassText">진행중</strong></div>
+          </div>
+          <button class="primary-btn" id="certificateBtn" type="button" onclick="printCertificate()" style="width:100%;margin-top:14px" disabled>수료증 출력</button>
+        </aside>
+        <div class="quiz-box" aria-live="polite">
+          <div class="quiz-top">
+            <span class="quiz-pill" id="quizCategory">증권 기초</span>
+            <span class="quiz-pill" id="quizLockText">정답 후 다음 문항</span>
+          </div>
+          <div class="quiz-question" id="quizQuestion">문제를 불러오는 중입니다.</div>
+          <div class="quiz-options" id="quizOptions"></div>
+          <div class="quiz-feedback" id="quizFeedback"></div>
+          <div class="quiz-actions">
+            <button class="reset-btn" type="button" onclick="resetQuizProgress()">처음부터</button>
+            <button class="next-btn" id="quizNextBtn" type="button" onclick="goNextQuiz()" disabled>다음 문항</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="videoTitle">
+  <div class="video-box">
+    <div class="video-header">
+      <h3 id="videoTitle">강의 시청</h3>
+      <button class="close-btn" type="button" onclick="closeVideo()" aria-label="닫기">×</button>
+    </div>
+    <iframe class="video-frame" id="videoFrame" title="강의 영상" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    <div class="video-footer"><span id="watchTimeText">시청 시간 0초</span><span>8분 시청 시 완료 처리됩니다.</span></div>
+  </div>
+</div>
+
+<div class="online-badge" id="onlineStatus">연결중...</div>
+<div class="toast" id="toast">저장되었습니다.</div>
 
   <script>
     const COURSES = [
