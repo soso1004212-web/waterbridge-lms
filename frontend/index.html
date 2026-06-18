@@ -156,7 +156,7 @@ body{
     <div class="stats">
       <div class="stat"><strong>100+</strong><span>퀴즈 문항 지원</span></div>
       <div class="stat"><strong>24/7</strong><span>온라인 학습 환경</span></div>
-      <div class="stat"><strong>보안</strong><span>Firebase 인증 연동</span></div>
+      <div class="stat"><strong>보안</strong><span>관리자 승인 연동</span></div>
     </div>
   </section>
 
@@ -201,12 +201,12 @@ body{
       <div class="msg" id="msg" role="status" aria-live="polite"></div>
 
       <div class="notice">
-        이메일 인증이 완료된 계정만 로그인할 수 있습니다. 관리자는 자동으로 관리자 페이지로, 일반 회원은 학습 페이지로 이동합니다.
+        관리자 승인이 완료된 계정만 로그인할 수 있습니다. 관리자는 자동으로 관리자 페이지로, 승인된 일반 회원은 학습 페이지로 이동합니다.
       </div>
 
       <div class="security">
         <span>🔒</span>
-        <p>로그인 정보는 Firebase Authentication을 통해 처리되며, 브라우저에는 비밀번호를 저장하지 않습니다.</p>
+        <p>로그인 정보는 Firebase Authentication 및 관리자 승인 절차를 통해 처리되며, 브라우저에는 비밀번호를 저장하지 않습니다.</p>
       </div>
       <div class="footer">© 2026 WaterBridge LMS. All rights reserved.</div>
     </div>
@@ -215,7 +215,7 @@ body{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -268,8 +268,28 @@ window.togglePassword = () => {
 async function moveByRole(user){
   const userDoc = doc(db, "users", user.uid);
   const snap = await getDoc(userDoc);
-  const data = snap.exists() ? snap.data() : {};
+
+  if(!snap.exists()){
+    await signOut(auth);
+    setMessage("회원 정보가 없습니다. 관리자에게 문의해주세요.", "error");
+    return;
+  }
+
+  const data = snap.data();
   const role = data.role || "user";
+  const isApproved = role === "admin" || data.approved === true || data.approvalStatus === "approved";
+
+  if(!isApproved){
+    await setDoc(userDoc, {
+      email: user.email || data.email || "",
+      online: false,
+      lastSeen: Date.now()
+    }, { merge: true });
+
+    await signOut(auth);
+    setMessage("관리자 승인 대기 중입니다. 승인 완료 후 로그인할 수 있습니다.", "error");
+    return;
+  }
 
   sessionStorage.setItem("role", role);
   sessionStorage.setItem("name", data.name || user.email);
@@ -303,12 +323,6 @@ window.login = async () => {
 
     const credential = await signInWithEmailAndPassword(auth, email, password);
     const user = credential.user;
-
-    if(!user.emailVerified){
-      setMessage("이메일 인증 후 로그인해주세요. 받은 메일함을 확인해주세요.", "error");
-      setLoading(false);
-      return;
-    }
 
     if($("rememberEmail").checked){
       localStorage.setItem("waterbridge_saved_email", email);
@@ -350,7 +364,7 @@ $("loginForm").addEventListener("submit", (event) => {
 });
 
 onAuthStateChanged(auth, async (user) => {
-  if(user && user.emailVerified){
+  if(user){
     setMessage("이미 로그인된 계정이 있어 이동합니다.", "success");
     await moveByRole(user);
   }

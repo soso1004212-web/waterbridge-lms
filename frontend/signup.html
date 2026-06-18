@@ -70,9 +70,9 @@ label{display:flex;justify-content:space-between;align-items:center;font-weight:
   <section class="hero" aria-label="WaterBridge LMS 소개">
     <div class="brand"><div class="brand-icon">W</div><div><b>WaterBridge LMS</b><span>Professional Learning Platform</span></div></div>
     <h1>안전한 학습 계정을<br>지금 생성하세요.</h1>
-    <p>이메일 인증 기반으로 계정을 보호하고, 강의 진도·퀴즈 결과·포인트를 개인별로 안전하게 관리합니다.</p>
+    <p>관리자 승인 기반으로 계정을 보호하고, 승인된 회원만 강의 진도·퀴즈 결과·포인트를 이용할 수 있습니다.</p>
     <div class="benefits">
-      <div class="benefit"><i>✓</i><div><strong>이메일 인증 로그인</strong><small>가입 후 인증된 사용자만 LMS에 접근할 수 있습니다.</small></div></div>
+      <div class="benefit"><i>✓</i><div><strong>관리자 승인 로그인</strong><small>가입 후 관리자가 승인한 사용자만 LMS에 접근할 수 있습니다.</small></div></div>
       <div class="benefit"><i>✓</i><div><strong>학습 데이터 자동 저장</strong><small>강의 완료, 퀴즈 진행, 포인트 정보를 계정별로 관리합니다.</small></div></div>
       <div class="benefit"><i>✓</i><div><strong>관리자 대시보드 연동</strong><small>관리자는 실시간 접속자와 학습 현황을 확인할 수 있습니다.</small></div></div>
     </div>
@@ -162,7 +162,7 @@ label{display:flex;justify-content:space-between;align-items:center;font-weight:
 
       <div class="security">
         <div><b>SSL 권장</b><span>HTTPS 배포</span></div>
-        <div><b>Email Verify</b><span>인증 후 로그인</span></div>
+        <div><b>Admin Approve</b><span>승인 후 로그인</span></div>
         <div><b>Firebase Auth</b><span>계정 보호</span></div>
       </div>
 
@@ -174,7 +174,7 @@ label{display:flex;justify-content:space-between;align-items:center;font-weight:
 <script type="module">
 import { auth, db } from "./firebase-config.js";
 import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import { createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
 const $ = (id) => document.getElementById(id);
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -270,7 +270,11 @@ window.signup = async () => {
       name,
       email,
       role: "user",
-      grade: "일반회원",
+      grade: "승인대기",
+      approved: false,
+      approvalStatus: "pending",
+      approvedAt: null,
+      approvedBy: null,
       point: 0,
       totalCourses: 8,
       completedCourses: 0,
@@ -283,9 +287,8 @@ window.signup = async () => {
       createdAt: serverTimestamp()
     }, { merge: true });
 
-    await sendEmailVerification(userCredential.user);
-    showMessage("회원가입이 완료되었습니다. 이메일 인증 후 로그인해주세요.", "ok");
-    setTimeout(() => { location.href = "index.html"; }, 1800);
+    showMessage("회원가입이 완료되었습니다. 관리자 승인 후 로그인할 수 있습니다.", "ok");
+    setTimeout(() => { location.href = "index.html"; }, 2200);
   }catch(err){
     console.error(err);
     let message = "회원가입 중 오류가 발생했습니다.";
