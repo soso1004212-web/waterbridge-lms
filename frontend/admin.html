@@ -128,6 +128,22 @@ textarea:focus{
 .password-card-body p{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:14px}
 .password-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
 
+
+.action-row{
+  min-width:260px;
+}
+.action-row .btn:disabled,
+.password-actions .btn:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+.password-card-body .field + .field{
+  margin-top:12px;
+}
+.table-wrap table td:last-child{
+  min-width:280px;
+}
+
 </style>
 </head>
 <body>
@@ -207,7 +223,7 @@ textarea:focus{
     </section>
 
     <section id="users" class="panel" style="margin-top:18px">
-      <div class="panel-head"><div><h3>👥 회원 목록</h3><p>회원 승인 상태, 역할, 학습 상태를 확인하고 승인/승인취소, 비밀번호 직접 변경, 관리자 권한 부여를 처리합니다.</p></div><div class="user-tools"><input id="userSearch" class="search" placeholder="이름/이메일 검색" oninput="renderUsers()"><button class="btn primary small" onclick="loadUsers()">새로고침</button></div></div>
+      <div class="panel-head"><div><h3>👥 회원 목록</h3><p>회원 승인 상태, 역할, 학습 상태를 확인하고 승인/승인취소, 비밀번호 변경, 관리자 권한 부여, 강제 로그아웃을 처리합니다.</p></div><div class="user-tools"><input id="userSearch" class="search" placeholder="이름/이메일 검색" oninput="renderUsers()"><button class="btn primary small" onclick="loadUsers()">새로고침</button></div></div>
       <div class="table-wrap"><table><thead><tr><th>회원</th><th>승인 상태</th><th>역할</th><th>완료 강의</th><th>포인트</th><th>접속 상태</th><th>최근 활동</th><th>관리</th></tr></thead><tbody id="userTable"><tr><td colspan="8">로딩중...</td></tr></tbody></table></div>
     </section>
 
@@ -225,7 +241,7 @@ textarea:focus{
       <button class="btn ghost small" onclick="closePasswordModal()">닫기</button>
     </div>
     <div class="password-card-body">
-      <p id="passwordTargetText">대상 회원을 선택하세요.</p>
+      <p id="passwordTargetText">대상 회원을 선택하세요.</p><p style="margin-top:-6px;color:#dc2626;font-weight:700">변경 후 해당 회원은 자동 로그아웃되며 새 비밀번호로 다시 로그인해야 합니다.</p>
       <input type="hidden" id="passwordTargetUid">
       <input type="hidden" id="passwordTargetEmail">
       <div class="field">
@@ -483,15 +499,20 @@ window.renderUsers = function(){
           ? `<button class="btn cancel small" onclick="cancelApproval('${u.id}')">승인취소</button>`
           : `<button class="btn approve small" onclick="approveUser('${u.id}')">승인</button>`);
 
-    const roleButton = isAdmin
-      ? `<button class="btn reject small" onclick="makeUser('${u.id}')">회원전환</button>`
-      : `<button class="btn primary small" onclick="makeAdmin('${u.id}')">관리자승격</button>`;
+    const isMe = currentAdmin && currentAdmin.uid === u.id;
 
+    const roleButton = isMe
+      ? '<span style="color:#94a3b8;font-size:13px">현재 관리자</span>'
+      : (isAdmin
+          ? `<button class="btn reject small" onclick="makeUser('${u.id}')">회원전환</button>`
+          : `<button class="btn primary small" onclick="makeAdmin('${u.id}')">관리자승격</button>`);
+
+    const safeEmail = encodeURIComponent(u.email || '');
     const resetButton = u.email
-      ? `<button class="btn ghost small" onclick="openPasswordModal('${u.id}', '${String(u.email || '').replace(/'/g, "\\'")}')">비밀번호변경</button>`
+      ? `<button class="btn ghost small" onclick="openPasswordModal('${u.id}', decodeURIComponent('${safeEmail}'))">비밀번호변경</button>`
       : '';
 
-    const forceLogoutButton = currentAdmin && currentAdmin.uid === u.id
+    const forceLogoutButton = isMe
       ? ''
       : `<button class="btn danger small" onclick="forceLogoutUser('${u.id}')">강제로그아웃</button>`;
 
@@ -636,6 +657,13 @@ window.changeUserPassword = async function(){
 
   if(!confirm(`${email || '선택한 회원'}의 비밀번호를 직접 변경하시겠습니까?`)) return;
 
+  const btn = document.querySelector('.password-actions .btn.primary');
+  const oldText = btn ? btn.textContent : '';
+  if(btn){
+    btn.disabled = true;
+    btn.textContent = '변경 중...';
+  }
+
   try{
     const token = await auth.currentUser.getIdToken(true);
 
@@ -651,7 +679,7 @@ window.changeUserPassword = async function(){
     const result = await res.json().catch(() => ({}));
 
     if(!res.ok){
-      throw new Error(result.error || '비밀번호 변경 실패');
+      throw new Error(result.error || '비밀번호 변경 API 응답 오류');
     }
 
     await updateDoc(doc(db, 'users', uid), {
@@ -659,7 +687,9 @@ window.changeUserPassword = async function(){
       passwordChangedBy: currentAdmin?.uid || null,
       forceLogout: true,
       forceLogoutAt: Date.now(),
-      online: false
+      online: false,
+      currentCourse: null,
+      currentCourseTitle: null
     });
 
     toast('비밀번호가 변경되었습니다. 해당 회원은 다시 로그인해야 합니다.');
@@ -667,7 +697,17 @@ window.changeUserPassword = async function(){
     await loadUsers();
   }catch(e){
     console.error(e);
-    toast(e.message || '비밀번호 변경 중 오류가 발생했습니다.');
+    const msg = String(e.message || '');
+    if(msg.includes('Failed to fetch') || msg.includes('404') || msg.includes('API')){
+      toast('비밀번호 변경 API가 아직 배포되지 않았습니다. api/admin-update-password.js와 Vercel 환경변수를 확인하세요.');
+    }else{
+      toast(msg || '비밀번호 변경 중 오류가 발생했습니다.');
+    }
+  }finally{
+    if(btn){
+      btn.disabled = false;
+      btn.textContent = oldText || '변경하기';
+    }
   }
 }
 
@@ -687,6 +727,24 @@ function startLiveWatching(){
     $('liveCourses').innerHTML = watching.length ? watching.map(u => `<div class="person"><div><b>${esc(u.name || '이름 없음')}</b><small>현재 강의: ${esc(u.currentCourseTitle || u.currentCourse)}</small></div><span class="status online"><span class="dot"></span>시청중</span></div>`).join('') : `<div class="empty">현재 강의 시청자가 없습니다.</div>`;
   });
 }
+
+
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && $('passwordModal')?.classList.contains('active')){
+    closePasswordModal();
+  }
+});
+
+document.getElementById('passwordModal')?.addEventListener('click', (e) => {
+  if(e.target.id === 'passwordModal') closePasswordModal();
+});
+
+document.querySelectorAll('.nav a').forEach(a => {
+  a.addEventListener('click', () => {
+    document.querySelectorAll('.nav a').forEach(x => x.classList.remove('active'));
+    a.classList.add('active');
+  });
+});
 
 window.addEventListener("visibilitychange", async () => {
   const user = auth.currentUser; if(!user) return;
