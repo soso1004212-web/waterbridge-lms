@@ -29,6 +29,65 @@ button,input,select{font:inherit} button{cursor:pointer;border:0}.app{display:fl
 
 @media(max-width:1050px){.sidebar{position:static;width:100%;border-radius:0}.app{display:block}.main{margin-left:0;width:100%;padding:18px}.stats,.layout{grid-template-columns:1fr 1fr}.sidebar .nav{grid-template-columns:repeat(4,1fr)}.side-card{display:none}}
 @media(max-width:760px){.stats,.layout,.form-grid{grid-template-columns:1fr}.topbar{display:block}.actions{margin-top:14px}.sidebar{padding:20px}.sidebar .nav{grid-template-columns:1fr 1fr}.title h2{font-size:25px}.panel-head{display:block}.user-tools{margin-top:12px}.search{width:100%}}
+
+textarea{
+  width:100%;
+  min-height:96px;
+  resize:vertical;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:13px 14px;
+  background:#f8fafc;
+  outline:none;
+}
+textarea:focus{
+  border-color:#93c5fd;
+  background:#fff;
+  box-shadow:0 0 0 4px rgba(37,99,235,.1);
+}
+.course-admin-list{display:grid;gap:10px}
+.course-admin-item{
+  border:1px solid #eef2f7;
+  background:#fbfdff;
+  border-radius:18px;
+  padding:14px;
+  display:grid;
+  grid-template-columns:88px 1fr auto;
+  gap:14px;
+  align-items:center;
+}
+.course-admin-thumb{
+  width:88px;
+  height:58px;
+  border-radius:12px;
+  object-fit:cover;
+  background:#e5e7eb;
+  border:1px solid var(--line);
+}
+.course-admin-item b{display:block;margin-bottom:4px}
+.course-admin-item small{display:block;color:var(--muted);line-height:1.45}
+.quiz-editor{display:grid;gap:14px}
+.quiz-question-card{
+  border:1px solid #eef2f7;
+  background:#fbfdff;
+  border-radius:18px;
+  padding:16px;
+}
+.quiz-question-card h4{
+  font-size:15px;
+  margin-bottom:12px;
+}
+.option-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+@media(max-width:760px){
+  .course-admin-item{grid-template-columns:1fr}
+  .course-admin-thumb{width:100%;height:120px}
+  .option-grid{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
@@ -36,7 +95,7 @@ button,input,select{font:inherit} button{cursor:pointer;border:0}.app{display:fl
   <aside class="sidebar">
     <div class="brand"><div class="brand-mark">W</div><div><h1>WaterBridge</h1><p>LMS Admin Console</p></div></div>
     <nav class="nav">
-      <a class="active" href="#dashboard">📊 대시보드</a><a href="#course">📚 강의관리</a><a href="#users">👥 회원관리</a><a href="#live">🟢 실시간</a>
+      <a class="active" href="#dashboard">📊 대시보드</a><a href="#course">📚 강의관리</a><a href="#quizManage">📝 퀴즈관리</a><a href="#users">👥 회원관리</a><a href="#live">🟢 실시간</a>
     </nav>
     <div class="side-card"><strong id="adminName">관리자 확인중</strong><span id="adminEmail">권한 검증 중입니다.</span></div>
   </aside>
@@ -56,20 +115,54 @@ button,input,select{font:inherit} button{cursor:pointer;border:0}.app{display:fl
 
     <section class="grid layout">
       <div id="course" class="panel">
-        <div class="panel-head"><div><h3>📚 강의 추가</h3><p>강의 ID, 제목, 설명을 입력해 Firestore courses 컬렉션에 저장합니다.</p></div></div>
+        <div class="panel-head"><div><h3>📚 강의 관리</h3><p>강의 정보, 영상 URL, 썸네일, 순서와 잠금 조건을 관리합니다.</p></div></div>
         <div class="panel-body">
           <div class="form-grid">
-            <div class="field"><label for="courseId">강의 ID</label><input id="courseId" placeholder="예: phishing_basic_01"></div>
-            <div class="field"><label for="title">강의명</label><input id="title" placeholder="예: 보이스피싱 예방 기초"></div>
+            <div class="field"><label for="courseId">강의 ID</label><input id="courseId" placeholder="예: asset_admin_intro"></div>
+            <div class="field"><label for="courseOrder">순서</label><input id="courseOrder" type="number" placeholder="예: 1"></div>
+            <div class="field"><label for="title">강의명</label><input id="title" placeholder="예: 자산 행정 매니저 입문"></div>
+            <div class="field"><label for="requiredCourse">이전 필수 강의 ID</label><input id="requiredCourse" placeholder="예: securities_basic / 없으면 비움"></div>
+            <div class="field full"><label for="videoUrl">영상 URL</label><input id="videoUrl" placeholder="YouTube embed URL 또는 영상 주소"></div>
+            <div class="field full"><label for="thumbnailUrl">썸네일 이미지 URL</label><input id="thumbnailUrl" placeholder="강의 카드에 표시할 이미지 URL"></div>
             <div class="field full"><label for="desc">강의 설명</label><input id="desc" placeholder="강의 내용을 짧게 입력하세요"></div>
-            <div class="field full"><button class="btn primary" onclick="addCourse()">+ 강의 추가하기</button></div>
+            <div class="field full">
+              <button class="btn primary" onclick="saveCourse()">저장 / 수정하기</button>
+              <button class="btn ghost" onclick="clearCourseForm()" style="margin-left:8px">입력 초기화</button>
+            </div>
           </div>
+          <div style="height:18px"></div>
+          <div class="panel-head" style="padding:0 0 14px;border-bottom:0">
+            <div><h3>등록된 강의</h3><p>강의를 선택하면 위 입력창에서 수정할 수 있습니다.</p></div>
+            <button class="btn ghost small" onclick="loadCourses()">강의 불러오기</button>
+          </div>
+          <div id="courseAdminList" class="course-admin-list"><div class="empty">강의 목록을 불러오세요.</div></div>
         </div>
       </div>
 
       <div class="panel">
         <div class="panel-head"><div><h3>🔐 관리자 상태</h3><p>현재 로그인된 관리자 권한 정보입니다.</p></div></div>
         <div class="panel-body"><div id="status" class="empty">관리자 권한 확인중...</div></div>
+      </div>
+    </section>
+
+
+    <section id="quizManage" class="panel" style="margin-top:18px">
+      <div class="panel-head">
+        <div>
+          <h3>📝 영상별 퀴즈 관리</h3>
+          <p>강의별 10문항을 수정합니다. 정답 번호는 1~4 중 하나로 입력하세요.</p>
+        </div>
+        <div class="user-tools">
+          <select id="quizCourseSelect" class="search" onchange="loadQuizForCourse()">
+            <option value="">강의를 선택하세요</option>
+          </select>
+          <button class="btn primary small" onclick="saveQuiz()">퀴즈 저장</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div id="quizEditor" class="quiz-editor">
+          <div class="empty">강의를 선택하면 10문항 편집창이 표시됩니다.</div>
+        </div>
       </div>
     </section>
 
@@ -89,9 +182,10 @@ button,input,select{font:inherit} button{cursor:pointer;border:0}.app{display:fl
 <script type="module">
 import { auth, db } from "./firebase-config.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-import { collection, getDocs, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 let allUsers = [];
+let allCourses = [];
 let currentAdmin = null;
 let onlineUnsubscribe = null;
 let liveUnsubscribe = null;
@@ -113,7 +207,7 @@ onAuthStateChanged(auth, async (user) => {
   $('adminName').textContent = data.name || '관리자';
   $('adminEmail').textContent = user.email || data.email || '';
   $('status').innerHTML = `<b>✅ 관리자 로그인 완료</b><br><span style="color:#64748b">${esc(data.name || user.email)} 계정으로 접속 중입니다.</span>`;
-  loadUsers(); startOnlineListener(); startLiveWatching();
+  loadUsers(); loadCourses(); startOnlineListener(); startLiveWatching();
 });
 
 window.logout = async function(){
@@ -122,12 +216,183 @@ window.logout = async function(){
   await signOut(auth); location.replace("index.html");
 }
 
-window.addCourse = async function(){
-  const id = $('courseId').value.trim(); const title = $('title').value.trim(); const desc = $('desc').value.trim();
+
+window.saveCourse = async function(){
+  const id = $('courseId').value.trim();
+  const title = $('title').value.trim();
+  const desc = $('desc').value.trim();
+  const order = Number($('courseOrder').value || 0);
+  const required = $('requiredCourse').value.trim();
+  const videoUrl = $('videoUrl').value.trim();
+  const thumbnailUrl = $('thumbnailUrl').value.trim();
+
   if(!id || !title){ toast('강의 ID와 강의명을 입력해주세요.'); return; }
-  await setDoc(doc(db,"courses",id), { title, desc, createdAt:Date.now(), updatedAt:Date.now() }, { merge:true });
-  $('courseId').value=''; $('title').value=''; $('desc').value=''; toast('강의가 추가되었습니다.');
+
+  await setDoc(doc(db,"courses",id), {
+    title,
+    desc,
+    order,
+    required: required || null,
+    videoUrl,
+    thumbnailUrl,
+    updatedAt:Date.now(),
+    createdAt: Date.now()
+  }, { merge:true });
+
+  toast('강의가 저장되었습니다.');
+  clearCourseForm();
+  await loadCourses();
 }
+
+window.clearCourseForm = function(){
+  ['courseId','courseOrder','title','requiredCourse','videoUrl','thumbnailUrl','desc'].forEach(id => {
+    const el = $(id);
+    if(el) el.value = '';
+  });
+}
+
+window.loadCourses = async function(){
+  const snap = await getDocs(collection(db,"courses"));
+  allCourses = snap.docs.map(d => ({ id:d.id, ...d.data() }))
+    .sort((a,b) => Number(a.order || 0) - Number(b.order || 0));
+
+  renderCourseAdminList();
+  renderQuizCourseSelect();
+}
+
+function renderCourseAdminList(){
+  const list = $('courseAdminList');
+  if(!allCourses.length){
+    list.innerHTML = '<div class="empty">등록된 강의가 없습니다.</div>';
+    return;
+  }
+
+  list.innerHTML = allCourses.map(c => `
+    <div class="course-admin-item">
+      <img class="course-admin-thumb" src="${esc(c.thumbnailUrl || 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600')}" onerror="this.src='https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600'">
+      <div>
+        <b>${esc(c.title || c.id)}</b>
+        <small>ID: ${esc(c.id)} · 순서: ${Number(c.order || 0)} · 이전강의: ${esc(c.required || '-')}</small>
+        <small>${esc(c.desc || '')}</small>
+        <small>영상: ${esc(c.videoUrl || '-')}</small>
+      </div>
+      <div class="action-row">
+        <button class="btn ghost small" onclick="editCourse('${c.id}')">수정</button>
+        <button class="btn danger small" onclick="deleteCourse('${c.id}')">삭제</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.editCourse = function(id){
+  const c = allCourses.find(x => x.id === id);
+  if(!c) return;
+  $('courseId').value = c.id || '';
+  $('courseOrder').value = c.order || '';
+  $('title').value = c.title || '';
+  $('requiredCourse').value = c.required || '';
+  $('videoUrl').value = c.videoUrl || '';
+  $('thumbnailUrl').value = c.thumbnailUrl || '';
+  $('desc').value = c.desc || '';
+  location.hash = '#course';
+}
+
+window.deleteCourse = async function(id){
+  if(!confirm('이 강의를 삭제하시겠습니까? 연결된 퀴즈는 별도로 남아있을 수 있습니다.')) return;
+  await deleteDoc(doc(db,'courses',id));
+  toast('강의가 삭제되었습니다.');
+  await loadCourses();
+}
+
+function renderQuizCourseSelect(){
+  const select = $('quizCourseSelect');
+  if(!select) return;
+  const current = select.value;
+  select.innerHTML = '<option value="">강의를 선택하세요</option>' + allCourses.map(c =>
+    `<option value="${esc(c.id)}">${Number(c.order || 0)}. ${esc(c.title || c.id)}</option>`
+  ).join('');
+  if(current) select.value = current;
+}
+
+function defaultQuizForCourse(course){
+  const title = course?.title || '강의';
+  const desc = course?.desc || '강의 핵심 내용';
+  return [
+    {question:`${title}에서 가장 핵심적으로 이해해야 할 내용은?`, options:[desc,'개인 판단으로 처리','외부 공유','보고 생략'], answer:0},
+    {question:`${title} 업무를 진행할 때 가장 중요한 원칙은?`, options:['정확한 확인과 기록','빠른 임의 처리','구두 약속만 의존','보안 생략'], answer:0},
+    {question:`${title}와 관련해 고객에게 설명할 때 올바른 방식은?`, options:['쉽고 정확하게 설명한다','전문용어만 빠르게 말한다','질문을 무시한다','서류를 보여주지 않는다'], answer:0},
+    {question:`${title} 진행 중 정보가 맞지 않으면 어떻게 해야 하나?`, options:['업무를 멈추고 관리자에게 확인한다','그대로 진행한다','임의로 수정한다','고객에게 숨긴다'], answer:0},
+    {question:`${title}에서 기록을 남겨야 하는 이유는?`, options:['업무 추적과 책임 확인을 위해','형식만 맞추기 위해','개인 보관을 위해','외부 홍보를 위해'], answer:0},
+    {question:`${title}에서 개인정보 처리 원칙으로 맞는 것은?`, options:['필요한 범위에서 안전하게 처리한다','개인 메신저로 자유롭게 보낸다','외부에 공유한다','퇴사 후 보관한다'], answer:0},
+    {question:`${title} 업무에서 하면 안 되는 행동은?`, options:['무단 처리 또는 대리 서명','본인확인','서류 검수','관리자 보고'], answer:0},
+    {question:`${title} 완료 후 필요한 조치는?`, options:['결과와 특이사항을 보고한다','보고를 생략한다','서류를 개인 보관한다','관련 기록을 삭제한다'], answer:0},
+    {question:`${title}에서 판단이 애매할 때 올바른 대응은?`, options:['규정과 관리자 확인을 요청한다','혼자 결정한다','고객에게 숨긴다','무조건 진행한다'], answer:0},
+    {question:`${title}의 최종 목적에 가장 가까운 것은?`, options:['안전하고 정확한 자산 행정 처리','수익 보장 약속','비공식 처리','고객 정보 수집'], answer:0}
+  ];
+}
+
+window.loadQuizForCourse = async function(){
+  const courseId = $('quizCourseSelect').value;
+  const editor = $('quizEditor');
+  if(!courseId){
+    editor.innerHTML = '<div class="empty">강의를 선택하면 10문항 편집창이 표시됩니다.</div>';
+    return;
+  }
+
+  const course = allCourses.find(c => c.id === courseId);
+  const snap = await getDoc(doc(db,'courseQuizzes',courseId));
+  const quiz = snap.exists() && Array.isArray(snap.data().questions)
+    ? snap.data().questions
+    : defaultQuizForCourse(course);
+
+  renderQuizEditor(quiz.slice(0,10));
+}
+
+function renderQuizEditor(quiz){
+  const normalized = Array.from({length:10}, (_,i) => quiz[i] || {question:'', options:['','','',''], answer:0});
+  $('quizEditor').innerHTML = normalized.map((q,i) => `
+    <div class="quiz-question-card" data-quiz-index="${i}">
+      <h4>${i+1}번 문항</h4>
+      <div class="field full"><label>문제</label><textarea class="q-question">${esc(q.question || '')}</textarea></div>
+      <div class="option-grid">
+        <div class="field"><label>보기 1</label><input class="q-option" value="${esc(q.options?.[0] || '')}"></div>
+        <div class="field"><label>보기 2</label><input class="q-option" value="${esc(q.options?.[1] || '')}"></div>
+        <div class="field"><label>보기 3</label><input class="q-option" value="${esc(q.options?.[2] || '')}"></div>
+        <div class="field"><label>보기 4</label><input class="q-option" value="${esc(q.options?.[3] || '')}"></div>
+      </div>
+      <div class="field" style="margin-top:10px"><label>정답 번호</label><input class="q-answer" type="number" min="1" max="4" value="${Number(q.answer || 0)+1}"></div>
+    </div>
+  `).join('');
+}
+
+window.saveQuiz = async function(){
+  const courseId = $('quizCourseSelect').value;
+  if(!courseId){ toast('먼저 강의를 선택해주세요.'); return; }
+
+  const cards = [...document.querySelectorAll('.quiz-question-card')];
+  if(cards.length !== 10){ toast('퀴즈 10문항을 불러온 뒤 저장해주세요.'); return; }
+
+  const questions = cards.map(card => {
+    const question = card.querySelector('.q-question').value.trim();
+    const options = [...card.querySelectorAll('.q-option')].map(i => i.value.trim());
+    let answer = Number(card.querySelector('.q-answer').value || 1) - 1;
+    answer = Math.max(0, Math.min(3, answer));
+    return { question, options, answer };
+  });
+
+  const invalid = questions.some(q => !q.question || q.options.some(o => !o));
+  if(invalid){ toast('모든 문제와 보기를 입력해주세요.'); return; }
+
+  await setDoc(doc(db,'courseQuizzes',courseId), {
+    courseId,
+    questions,
+    updatedAt: Date.now(),
+    updatedBy: currentAdmin?.uid || null
+  }, { merge:true });
+
+  toast('퀴즈가 저장되었습니다.');
+}
+
 
 window.loadUsers = async function(){
   const snap = await getDocs(collection(db,"users"));

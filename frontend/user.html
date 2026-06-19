@@ -1,2215 +1,502 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
-<meta http-equiv="Pragma" content="no-cache" />
-<meta http-equiv="Expires" content="0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WaterBridge LMS</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://www.youtube.com/iframe_api"></script>
 <style>
-:root{
-  --bg:#f5f6f8;
-  --panel:#fff;
-  --line:#d9dee7;
-  --line2:#edf0f4;
-  --text:#1f2937;
-  --muted:#6b7280;
-  --primary:#1f4e8c;
-  --primary-dark:#173b6b;
-  --green:#15803d;
-  --red:#b91c1c;
-  --amber:#b45309;
-  --soft:#f9fafb;
-}
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{
-  min-height:100vh;
-  font-family:'Pretendard',system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  font-size:14px;
-}
-a{color:inherit;text-decoration:none}
-button,input{font:inherit}
-button{border:0;cursor:pointer}
-.topbar{
-  height:58px;
-  background:#1f2937;
-  color:#fff;
-  border-bottom:1px solid #111827;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 28px;
-  position:sticky;
-  top:0;
-  z-index:50;
-}
-.brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-weight:700;
-  font-size:17px;
-}
-.brand-mark{
-  width:28px;
-  height:28px;
-  display:grid;
-  place-items:center;
-  border-radius:4px;
-  background:#fff;
-  color:#1f2937;
-  font-size:14px;
-  font-weight:800;
-}
-.nav{
-  display:flex;
-  align-items:center;
-  gap:4px;
-}
-.nav a,.ghost-btn,.logout{
-  padding:8px 11px;
-  border-radius:4px;
-  background:transparent;
-  color:#e5e7eb;
-  font-weight:500;
-  font-size:13px;
-}
-.nav a:hover,.ghost-btn:hover{background:rgba(255,255,255,.08)}
-.logout{background:#374151}
-.logout:hover{background:#4b5563}
-.menu-btn{display:none;background:transparent;color:#fff;font-size:22px}
-.container{
-  width:min(1180px,100%);
-  margin:0 auto;
-  padding:28px 24px 60px;
-}
-.page-title{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:20px;
-  margin-bottom:18px;
-}
-.page-title h1{
-  font-size:26px;
-  line-height:1.25;
-  letter-spacing:-.03em;
-  margin-bottom:7px;
-}
-.page-title p{color:var(--muted);line-height:1.55}
-.status-line{
-  color:#4b5563;
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:6px;
-  padding:10px 12px;
-  min-width:230px;
-  font-size:13px;
-}
-.status-line b{display:block;color:var(--text);margin-bottom:4px}
-.dashboard{
-  display:grid;
-  grid-template-columns:1.1fr .9fr;
-  gap:16px;
-  margin-bottom:16px;
-}
-.panel,.stat-card,.course-card,.quiz-card,.quiz-box{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:8px;
-}
+body{font-family:Arial,'Pretendard',sans-serif;background:#f5f6f8;color:#1f2937}
+.topbar{height:58px;background:#111827;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:10}
+.brand{font-weight:700;font-size:17px;display:flex;gap:10px;align-items:center}
+.brand-mark{width:28px;height:28px;background:#fff;color:#111827;border-radius:4px;display:grid;place-items:center;font-weight:800}
+.nav{display:flex;gap:6px;align-items:center}
+.nav a,.nav button{background:transparent;color:#e5e7eb;border:0;padding:8px 10px;border-radius:4px;cursor:pointer;text-decoration:none}
+.nav button{background:#374151}
+.container{max-width:1180px;margin:0 auto;padding:28px 24px 60px}
+.page-title{display:flex;justify-content:space-between;gap:20px;margin-bottom:18px}
+.page-title h1{font-size:26px;margin-bottom:7px}
+.page-title p,.muted{color:#6b7280;line-height:1.55}
+.status-line,.panel,.stat-card,.course-card{background:#fff;border:1px solid #d9dee7;border-radius:8px}
+.status-line{padding:10px 12px;min-width:230px;font-size:13px}
+.status-line b{display:block;margin-bottom:4px}
+.dashboard{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-bottom:16px}
 .panel{padding:20px}
-.panel h2{
-  font-size:18px;
-  margin-bottom:14px;
-}
-.profile-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-}
-.profile-row{
-  border:1px solid var(--line2);
-  background:var(--soft);
-  border-radius:6px;
-  padding:12px;
-}
-.profile-row span{
-  display:block;
-  color:var(--muted);
-  font-size:12px;
-  margin-bottom:6px;
-}
-.profile-row strong{font-size:14px}
-.notice-list{display:grid;gap:8px}
-.notice{
-  border:1px solid var(--line2);
-  background:var(--soft);
-  border-radius:6px;
-  padding:12px;
-  display:flex;
-  gap:10px;
-  align-items:flex-start;
-}
-.notice-icon{
-  width:24px;
-  height:24px;
-  display:grid;
-  place-items:center;
-  border-radius:4px;
-  background:#e5e7eb;
-  flex:0 0 auto;
-}
-.notice strong{display:block;margin-bottom:3px}
-.notice small{color:var(--muted);line-height:1.5}
-.stats{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:12px;
-  margin-bottom:16px;
-}
-.stat-card{
-  padding:16px;
-}
-.stat-card span{
-  color:var(--muted);
-  font-size:12px;
-  font-weight:600;
-}
-.stat-card b{
-  display:block;
-  font-size:24px;
-  margin-top:6px;
-  color:var(--text);
-}
-.stat-card small{
-  display:block;
-  color:var(--muted);
-  margin-top:5px;
-  font-size:12px;
-}
-.progress-wrap{display:grid;gap:10px}
-.progress-meta{
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  color:#374151;
-  font-weight:600;
-}
-.progress-bar{
-  height:10px;
-  background:#e5e7eb;
-  border-radius:999px;
-  overflow:hidden;
-}
-.progress{
-  height:100%;
-  width:0%;
-  background:var(--primary);
-  transition:width .25s ease;
-}
-.section-head{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:12px;
-  margin:26px 0 12px;
-}
-.section-head h2{
-  font-size:20px;
-  margin-bottom:5px;
-}
-.section-head p{color:var(--muted);line-height:1.5}
-.course-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:12px;
-}
-.course-card{
-  overflow:hidden;
-}
-.course-thumb{
-  height:74px;
-  background:#f3f4f6;
-  border-bottom:1px solid var(--line);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  position:relative;
-  font-size:26px;
-}
-.badge{
-  position:absolute;
-  top:10px;
-  left:10px;
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:999px;
-  padding:4px 8px;
-  font-size:11px;
-  color:#374151;
-  font-weight:600;
-}
+.panel h2{font-size:18px;margin-bottom:14px}
+.profile-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.profile-row{background:#f9fafb;border:1px solid #edf0f4;border-radius:6px;padding:12px}
+.profile-row span{display:block;color:#6b7280;font-size:12px;margin-bottom:6px}
+.notice{background:#f9fafb;border:1px solid #edf0f4;border-radius:6px;padding:12px;margin-bottom:8px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.stat-card{padding:16px}
+.stat-card span{color:#6b7280;font-size:12px;font-weight:600}
+.stat-card b{display:block;font-size:24px;margin-top:6px}
+.progress-bar{height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-top:10px}
+.progress{height:100%;width:0%;background:#1f4e8c}
+.section-head{margin:26px 0 12px}
+.section-head h2{font-size:20px;margin-bottom:5px}
+.course-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.course-card{overflow:hidden}
+.course-thumb{height:74px;background:#f3f4f6;border-bottom:1px solid #d9dee7;display:flex;align-items:center;justify-content:center;position:relative;font-size:26px}
+.badge{position:absolute;top:10px;left:10px;background:#fff;border:1px solid #d9dee7;border-radius:999px;padding:4px 8px;font-size:11px}
 .course-body{padding:16px}
-.course-title{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  font-weight:700;
-  font-size:16px;
-  margin-bottom:7px;
-}
-.course-desc{
-  color:var(--muted);
-  line-height:1.55;
-  min-height:42px;
-}
-.course-progress{
-  height:7px;
-  background:#e5e7eb;
-  border-radius:999px;
-  overflow:hidden;
-  margin:12px 0;
-}
-.course-progress-bar{
-  height:100%;
-  width:0%;
-  background:var(--green);
-}
-.watch-btn,.primary-btn,.secondary-btn,.next-btn,.reset-btn{
-  border-radius:5px;
-  padding:10px 12px;
-  font-weight:600;
-}
-.watch-btn{
-  width:100%;
-  background:var(--primary);
-  color:#fff;
-}
-.watch-btn:hover{background:var(--primary-dark)}
-.completed{
-  border-color:#bbf7d0;
-  background:#fbfefc;
-}
+.course-title{display:flex;justify-content:space-between;font-weight:700;font-size:16px;margin-bottom:7px}
+.course-desc{color:#6b7280;line-height:1.55;min-height:42px}
+.course-progress{height:7px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin:12px 0}
+.course-progress-bar{height:100%;width:0%;background:#15803d}
+.watch-btn{width:100%;border:0;border-radius:5px;padding:10px 12px;background:#1f4e8c;color:#fff;font-weight:600;cursor:pointer}
+.watch-btn:disabled{background:#9ca3af;cursor:not-allowed}
+.completed{border-color:#bbf7d0;background:#fbfefc}
 .completed .watch-btn{background:#6b7280}
-.check-mark{color:var(--green)}
-.locked{
-  background:#f9fafb;
-  color:#6b7280;
-}
-.locked .watch-btn{
-  background:#9ca3af;
-  cursor:not-allowed;
-}
-.lock-text{
-  margin-top:8px;
-  color:var(--red);
-  font-size:12px;
-  font-weight:600;
-}
-.primary-btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  background:var(--primary);
-  color:#fff;
-}
-.primary-btn:disabled{background:#9ca3af;cursor:not-allowed}
-.secondary-btn,.reset-btn{
-  background:#f3f4f6;
-  color:#374151;
-  border:1px solid var(--line);
-}
-.quiz-section{margin-top:28px}
-.quiz-layout{
-  display:grid;
-  grid-template-columns:340px 1fr;
-  gap:14px;
-  align-items:start;
-}
-.quiz-card,.quiz-box{padding:18px}
-.quiz-card h2{font-size:18px;margin-bottom:8px}
-.quiz-sub{color:var(--muted);line-height:1.6;margin-bottom:14px}
-.quiz-status{border-top:1px solid var(--line2)}
-.quiz-stat{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  border-bottom:1px solid var(--line2);
-  padding:11px 0;
-  color:var(--muted);
-}
-.quiz-stat strong{color:var(--text)}
-.quiz-top{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:14px;
-}
-.quiz-pill{
-  display:inline-flex;
-  padding:6px 9px;
-  border:1px solid var(--line);
-  border-radius:999px;
-  background:#f9fafb;
-  color:#374151;
-  font-size:12px;
-  font-weight:600;
-}
-.quiz-question{
-  font-size:18px;
-  line-height:1.45;
-  font-weight:700;
-  margin-bottom:14px;
-}
+.check-mark{color:#15803d}
+.lock-text{margin-top:8px;color:#b91c1c;font-size:12px;font-weight:600}
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(17,24,39,.72);z-index:100;padding:20px}
+.modal.active{display:flex}
+.video-box{width:min(920px,100%);background:#fff;border-radius:8px;overflow:hidden;border:1px solid #d9dee7}
+.video-header{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid #d9dee7}
+.close-btn{width:30px;height:30px;border:0;border-radius:4px;background:#f3f4f6;font-size:18px;cursor:pointer}
+.video-frame{width:100%;aspect-ratio:16/9;background:#000}
+.video-footer{padding:12px 16px;color:#6b7280;font-size:13px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.quiz-panel{display:none;padding:22px;background:#fff;border-top:1px solid #d9dee7}
+.video-box.quiz-mode .video-frame,.video-box.quiz-mode .video-footer{display:none}
+.video-box.quiz-mode .quiz-panel{display:block}
+.quiz-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:16px}
+.quiz-head strong{font-size:18px}
+.quiz-head p{color:#6b7280;line-height:1.5;margin-top:5px}
+.quiz-count{border:1px solid #d9dee7;background:#f9fafb;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;white-space:nowrap}
+.quiz-question{font-size:18px;line-height:1.45;font-weight:700;margin-bottom:14px}
 .quiz-options{display:grid;gap:8px}
-.quiz-option{
-  width:100%;
-  text-align:left;
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:6px;
-  padding:12px;
-  font-weight:500;
-}
-.quiz-option:hover{background:#f9fafb}
+.quiz-option{width:100%;text-align:left;background:#fff;border:1px solid #d9dee7;border-radius:6px;padding:12px;font-weight:500;cursor:pointer}
 .quiz-option.correct{background:#ecfdf5;border-color:#86efac;color:#166534}
 .quiz-option.wrong{background:#fef2f2;border-color:#fecaca;color:#991b1b}
-.quiz-option:disabled{cursor:not-allowed}
-.quiz-feedback{
-  margin-top:12px;
-  border:1px solid var(--line);
-  background:#f9fafb;
-  border-radius:6px;
-  padding:12px;
-  color:#4b5563;
-  line-height:1.55;
-  display:none;
-}
-.quiz-feedback.show{display:block}
-.quiz-actions{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  margin-top:14px;
-}
-.next-btn{background:var(--primary);color:#fff}
-.next-btn:disabled{background:#9ca3af;cursor:not-allowed}
-.modal{
-  position:fixed;
-  inset:0;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  background:rgba(17,24,39,.72);
-  z-index:100;
-  padding:20px;
-}
-.modal.active{display:flex}
-.video-box{
-  width:min(920px,100%);
-  background:#fff;
-  border-radius:8px;
-  overflow:hidden;
-  border:1px solid var(--line);
-}
-.video-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:13px 16px;
-  border-bottom:1px solid var(--line);
-}
-.video-header h3{font-size:16px}
-.close-btn{
-  width:30px;
-  height:30px;
-  border-radius:4px;
-  background:#f3f4f6;
-  color:#111827;
-  font-size:18px;
-}
-.video-frame{
-  width:100%;
-  aspect-ratio:16/9;
-  border:0;
-  display:block;
-  background:#000;
-}
-.video-footer{
-  padding:12px 16px;
-  color:var(--muted);
-  font-size:13px;
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  flex-wrap:wrap;
-}
-.online-badge{
-  position:fixed;
-  right:18px;
-  bottom:18px;
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:999px;
-  padding:8px 12px;
-  font-size:12px;
-  color:#374151;
-  z-index:80;
-}
-.toast{
-  position:fixed;
-  left:50%;
-  bottom:20px;
-  transform:translateX(-50%) translateY(80px);
-  background:#111827;
-  color:#fff;
-  border-radius:6px;
-  padding:10px 14px;
-  transition:.2s ease;
-  z-index:120;
-}
+.quiz-feedback{display:none;margin-top:12px;border:1px solid #d9dee7;background:#f9fafb;border-radius:6px;padding:12px;color:#4b5563}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(80px);background:#111827;color:#fff;border-radius:6px;padding:10px 14px;transition:.2s;z-index:120}
 .toast.show{transform:translateX(-50%) translateY(0)}
-@media(max-width:900px){
-  .dashboard,.quiz-layout,.course-grid{grid-template-columns:1fr}
-  .stats{grid-template-columns:repeat(2,1fr)}
-  .profile-grid{grid-template-columns:1fr}
-  .page-title{display:block}
-  .status-line{margin-top:12px}
-}
-@media(max-width:640px){
-  .topbar{height:auto;padding:12px 16px;align-items:flex-start}
-  .menu-btn{display:block}
-  .nav{
-    position:absolute;
-    top:54px;
-    left:12px;
-    right:12px;
-    background:#1f2937;
-    border:1px solid #374151;
-    display:none;
-    flex-direction:column;
-    align-items:stretch;
-    padding:8px;
-  }
-  .nav.active{display:flex}
-  .nav a,.ghost-btn,.logout{width:100%;text-align:left}
-  .container{padding:20px 14px 50px}
-  .stats{grid-template-columns:1fr}
-  .quiz-actions{display:grid}
-}
+.online-badge{position:fixed;right:18px;bottom:18px;background:#fff;border:1px solid #d9dee7;border-radius:999px;padding:8px 12px;font-size:12px;color:#374151}
+@media(max-width:900px){.dashboard,.course-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.profile-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div class="app-shell">
-  <header class="topbar">
-    <a class="brand" href="#" aria-label="WaterBridge LMS 홈">
-      <span class="brand-mark">W</span><span>WaterBridge LMS</span>
-    </a>
-    <button class="menu-btn" type="button" aria-label="메뉴 열기" onclick="toggleMenu()">☰</button>
-    <nav class="nav" id="navMenu">
-      <a href="#dashboard">대시보드</a>
-      <a href="#courses">강의</a>
-      <a href="#quiz">평가</a>
-      <button class="ghost-btn" type="button" onclick="scrollToContinue()">이어보기</button>
-      <button class="logout" type="button" onclick="logout()">로그아웃</button>
-    </nav>
-  </header>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark">W</span><span>WaterBridge LMS</span></div>
+  <nav class="nav">
+    <a href="#dashboard">대시보드</a>
+    <a href="#courses">강의</a>
+    <button type="button" onclick="scrollToContinue()">이어보기</button>
+    <button type="button" onclick="logout()">로그아웃</button>
+  </nav>
+</header>
 
-  <main class="container" id="dashboard">
-    <section class="page-title">
-      <div>
-        <h1>자산 행정 실무 교육</h1>
-        <p>강의 수강, 평가 진행, 학습 이력을 확인할 수 있습니다.</p>
-      </div>
-      <div class="status-line">
-        <b id="profileOnline">연결 확인 중</b>
-        <span id="lastSeenText">최근 접속 정보를 불러오는 중입니다.</span>
-      </div>
-    </section>
+<main class="container" id="dashboard">
+  <section class="page-title">
+    <div>
+      <h1>자산 행정 실무 교육</h1>
+      <p>강의 수강, 영상 완료 후 퀴즈 진행, 학습 이력을 확인할 수 있습니다.</p>
+    </div>
+    <div class="status-line"><b id="profileOnline">수강중</b><span id="lastSeenText">학습 상태를 확인 중입니다.</span></div>
+  </section>
 
-    <section class="dashboard">
-      <div class="panel">
-        <h2>내 정보</h2>
-        <div class="profile-grid">
-          <div class="profile-row"><span>이름</span><strong id="userName">로딩중...</strong></div>
-          <div class="profile-row"><span>이메일</span><strong id="userEmail">로딩중...</strong></div>
-          <div class="profile-row"><span>회원 등급</span><strong id="userGrade">일반</strong></div>
-        </div>
+  <section class="dashboard">
+    <div class="panel">
+      <h2>내 정보</h2>
+      <div class="profile-grid">
+        <div class="profile-row"><span>이름</span><strong id="userName">학습자</strong></div>
+        <div class="profile-row"><span>이메일</span><strong id="userEmail">-</strong></div>
+        <div class="profile-row"><span>회원 등급</span><strong id="userGrade">일반</strong></div>
       </div>
-      <div class="panel">
-        <h2>공지사항</h2>
-        <div class="notice-list">
-          <div class="notice"><span class="notice-icon">i</span><div><strong>교육 과정 안내</strong><small>자산 행정·증권 실무 8개 강의와 최종 평가가 준비되어 있습니다.</small></div></div>
-          <div class="notice"><span class="notice-icon">!</span><div><strong>시스템 점검 안내</strong><small>점검 일정은 관리자 공지에 따라 변경될 수 있습니다.</small></div></div>
-        </div>
-      </div>
-    </section>
+    </div>
+    <div class="panel">
+      <h2>공지사항</h2>
+      <div class="notice"><strong>교육 과정 안내</strong><br><span class="muted">각 영상을 끝까지 시청하면 해당 영상 퀴즈가 바로 시작됩니다.</span></div>
+      <div class="notice"><strong>부정 시청 방지</strong><br><span class="muted">영상 이동·재생속도 조작 감지 시 처음부터 다시 시청해야 합니다.</span></div>
+    </div>
+  </section>
 
-    <section class="stats" aria-label="학습 통계">
-      <div class="stat-card"><span>전체 강의</span><b id="totalCourses">0</b><small>등록된 과정</small></div>
-      <div class="stat-card"><span>완료 강의</span><b id="completedCourses">0</b><small>수강 완료</small></div>
-      <div class="stat-card"><span>수강률</span><b id="progressValue">0%</b><small>전체 과정 기준</small></div>
-      <div class="stat-card"><span>포인트</span><b id="pointValue">0</b><small>누적 포인트</small></div>
-    </section>
+  <section class="stats">
+    <div class="stat-card"><span>전체 강의</span><b id="totalCourses">0</b><small>등록된 과정</small></div>
+    <div class="stat-card"><span>완료 강의</span><b id="completedCourses">0</b><small>수강 완료</small></div>
+    <div class="stat-card"><span>수강률</span><b id="progressValue">0%</b><small>전체 과정 기준</small></div>
+    <div class="stat-card"><span>포인트</span><b id="pointValue">0</b><small>누적 포인트</small></div>
+  </section>
 
-    <section class="panel">
-      <h2>학습 현황</h2>
-      <div class="progress-wrap">
-        <div class="progress-meta"><span>WaterBridge 자산 행정 실무 과정</span><span class="progress-text">0% 완료</span></div>
-        <div class="progress-bar"><div class="progress"></div></div>
-        <p style="color:var(--muted);line-height:1.6">강의는 순서대로 진행되며, 이전 강의를 완료하면 다음 강의가 열립니다.</p>
-      </div>
-    </section>
+  <section class="panel">
+    <h2>학습 현황</h2>
+    <p class="muted">강의는 순서대로 진행되며, 이전 강의를 완료하면 다음 강의가 열립니다.</p>
+    <div class="progress-bar"><div class="progress" id="mainProgress"></div></div>
+  </section>
 
-    <section id="courses">
-      <div class="section-head">
-        <div>
-          <h2>강의 목록</h2>
-          <p>증권 기초, 고객 응대, 서류 검수, 인수인계 절차를 단계별로 학습합니다.</p>
-        </div>
-      </div>
-      <div class="course-grid" id="courseGrid"></div>
-    </section>
+  <section id="courses">
+    <div class="section-head">
+      <h2>강의 목록</h2>
+      <p class="muted">각 영상이 끝나면 같은 영상창에서 퀴즈 10문항이 바로 표시됩니다.</p>
+    </div>
+    <div class="course-grid" id="courseGrid"></div>
+  </section>
+</main>
 
-    <section class="quiz-section" id="quiz">
-      <div class="section-head">
-        <div>
-          <h2>최종 평가</h2>
-          <p>정답을 맞혀야 다음 문항으로 이동합니다.</p>
-        </div>
-      </div>
-      <div class="quiz-layout">
-        <aside class="quiz-card">
-          <h2>평가 진행 현황</h2>
-          <p class="quiz-sub">증권 기초, 명의이전, 고객 응대, 서류 검수, 개인정보보호, 인수인계 절차를 점검합니다.</p>
-          <div class="quiz-status">
-            <div class="quiz-stat"><span>현재 문항</span><strong id="quizCurrentText">1 / 100</strong></div>
-            <div class="quiz-stat"><span>정답 수</span><strong id="quizScoreText">0개</strong></div>
-            <div class="quiz-stat"><span>완료율</span><strong id="quizPercentText">0%</strong></div>
-            <div class="quiz-stat"><span>수료 기준</span><strong>100문항 완료</strong></div>
-            <div class="quiz-stat"><span>평가 상태</span><strong id="quizPassText">진행중</strong></div>
-          </div>
-          <button class="primary-btn" id="certificateBtn" type="button" onclick="printCertificate()" style="width:100%;margin-top:14px" disabled>수료증 출력</button>
-        </aside>
-        <div class="quiz-box" aria-live="polite">
-          <div class="quiz-top">
-            <span class="quiz-pill" id="quizCategory">증권 기초</span>
-            <span class="quiz-pill" id="quizLockText">정답 후 다음 문항</span>
-          </div>
-          <div class="quiz-question" id="quizQuestion">문제를 불러오는 중입니다.</div>
-          <div class="quiz-options" id="quizOptions"></div>
-          <div class="quiz-feedback" id="quizFeedback"></div>
-          <div class="quiz-actions">
-            <button class="reset-btn" type="button" onclick="resetQuizProgress()">처음부터</button>
-            <button class="next-btn" id="quizNextBtn" type="button" onclick="goNextQuiz()" disabled>다음 문항</button>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-</div>
-
-<div class="modal" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="videoTitle">
-  <div class="video-box">
+<div class="modal" id="videoModal">
+  <div class="video-box" id="videoBox">
     <div class="video-header">
       <h3 id="videoTitle">강의 시청</h3>
-      <button class="close-btn" type="button" onclick="closeVideo()" aria-label="닫기">×</button>
+      <button class="close-btn" type="button" onclick="closeVideo()">×</button>
     </div>
-    <iframe class="video-frame" id="videoFrame" title="강의 영상" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-    <div class="video-footer"><span id="watchTimeText">시청 시간 0초</span><span>8분 시청 시 완료 처리됩니다.</span></div>
+    <div class="video-frame" id="videoFrame"></div>
+    <div class="video-footer">
+      <span id="watchTimeText">시청 시간 0초</span>
+      <span>영상 이동·속도 조작 감지 시 처음부터 다시 시청해야 합니다.</span>
+    </div>
+    <div class="quiz-panel" id="quizPanel">
+      <div class="quiz-head">
+        <div>
+          <strong id="quizTitle">영상 퀴즈</strong>
+          <p>정답을 맞혀야 다음 문항으로 이동합니다. 틀리면 1번부터 다시 시작합니다.</p>
+        </div>
+        <span class="quiz-count" id="quizCount">1 / 10</span>
+      </div>
+      <div class="quiz-question" id="quizQuestion">문제를 불러오는 중입니다.</div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+    </div>
   </div>
 </div>
 
 <div class="online-badge" id="onlineStatus">연결중...</div>
 <div class="toast" id="toast">저장되었습니다.</div>
 
-  <script>
-    const COURSES = [
-      {
-            "id": "asset_admin_intro",
-            "title": "자산 행정 매니저 입문",
-            "desc": "직무 역할, 고객 방문 원칙, 업무 범위와 기본 윤리",
-            "icon": "🏢",
-            "level": "1단계",
-            "url": "https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=1",
-            "required": null,
-            "duration": 480
-      },
-      {
-            "id": "securities_basic",
-            "title": "증권 기초 이해",
-            "desc": "주식, 채권, 펀드, 증권계좌 등 핵심 개념 정리",
-            "icon": "📈",
-            "level": "2단계",
-            "url": "https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=1",
-            "required": "asset_admin_intro",
-            "duration": 480
-      },
-      {
-            "id": "ownership_transfer",
-            "title": "명의이전·소유권 이전 절차",
-            "desc": "증권 명의변경, 서류 흐름, 확인 항목 이해",
-            "icon": "📝",
-            "level": "3단계",
-            "url": "https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=1",
-            "required": "securities_basic",
-            "duration": 480
-      },
-      {
-            "id": "customer_visit",
-            "title": "고객 방문 및 응대 실무",
-            "desc": "방문 전 확인, 본인확인, 설명 방식, 민원 예방",
-            "icon": "🤝",
-            "level": "4단계",
-            "url": "https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=1",
-            "required": "ownership_transfer",
-            "duration": 480
-      },
-      {
-            "id": "document_review",
-            "title": "서류 확인 및 검수 실무",
-            "desc": "신분 확인, 서명·날인 확인, 누락·오류 대응",
-            "icon": "📄",
-            "level": "5단계",
-            "url": "https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=1",
-            "required": "customer_visit",
-            "duration": 480
-      },
-      {
-            "id": "asset_handover",
-            "title": "자산·서류 인수인계 관리",
-            "desc": "인계 기록, 보관 원칙, 전달 보고와 책임 관리",
-            "icon": "📦",
-            "level": "6단계",
-            "url": "https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=1",
-            "required": "document_review",
-            "duration": 480
-      },
-      {
-            "id": "privacy_compliance",
-            "title": "개인정보보호 및 컴플라이언스",
-            "desc": "개인정보 처리 원칙, 보안, 내부 규정, 사고 예방",
-            "icon": "🔐",
-            "level": "7단계",
-            "url": "https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=1",
-            "required": "asset_handover",
-            "duration": 480
-      },
-      {
-            "id": "final_assessment",
-            "title": "최종 실무 평가 과정",
-            "desc": "증권 행정, 고객 응대, 서류 검수, 보고 절차 종합 평가",
-            "icon": "🎓",
-            "level": "8단계",
-            "url": "https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=1",
-            "required": "privacy_compliance",
-            "duration": 480
+<script>
+const COURSES = [{"id": "asset_admin_intro", "title": "자산 행정 매니저 입문", "desc": "직무 역할, 고객 방문 원칙, 업무 범위와 기본 윤리", "icon": "🏢", "level": "1단계", "url": "https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=1", "required": null}, {"id": "securities_basic", "title": "증권 기초 이해", "desc": "주식, 채권, 펀드, 증권계좌 등 핵심 개념 정리", "icon": "📈", "level": "2단계", "url": "https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=1", "required": "asset_admin_intro"}, {"id": "ownership_transfer", "title": "명의이전·소유권 이전 절차", "desc": "증권 명의변경, 서류 흐름, 확인 항목 이해", "icon": "📝", "level": "3단계", "url": "https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=1", "required": "securities_basic"}, {"id": "customer_visit", "title": "고객 방문 및 응대 실무", "desc": "방문 전 확인, 본인확인, 설명 방식, 민원 예방", "icon": "🤝", "level": "4단계", "url": "https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=1", "required": "ownership_transfer"}, {"id": "document_review", "title": "서류 확인 및 검수 실무", "desc": "신분 확인, 서명·날인 확인, 누락·오류 대응", "icon": "📄", "level": "5단계", "url": "https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=1", "required": "customer_visit"}, {"id": "asset_handover", "title": "자산·서류 인수인계 관리", "desc": "인계 기록, 보관 원칙, 전달 보고와 책임 관리", "icon": "📦", "level": "6단계", "url": "https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=1", "required": "document_review"}, {"id": "privacy_compliance", "title": "개인정보보호 및 컴플라이언스", "desc": "개인정보 처리 원칙, 보안, 내부 규정, 사고 예방", "icon": "🔐", "level": "7단계", "url": "https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=1", "required": "asset_handover"}, {"id": "final_assessment", "title": "최종 실무 평가 과정", "desc": "증권 행정, 고객 응대, 서류 검수, 보고 절차 종합 평가", "icon": "🎓", "level": "8단계", "url": "https://www.youtube.com/embed/ysz5S6PUM-U?autoplay=1", "required": "privacy_compliance"}];
+const WATCH_SECONDS_FOR_COMPLETE = 20; // 실제 운영 시 480으로 변경하면 8분
+
+let latestUserData = JSON.parse(localStorage.getItem("wb_lms_data") || '{"completedCourseIds":[],"videoProgress":{}}');
+let currentCourseId = null;
+let currentTime = 0;
+let ytPlayer = null;
+let videoTimer = null;
+let guardTimer = null;
+let safeSeconds = 0;
+let videoEnded = false;
+let quizIndex = 0;
+let quizCourseId = null;
+let quizMode = false;
+
+function onYouTubeIframeAPIReady(){}
+
+function showToast(message){
+  const toast=document.getElementById("toast");
+  toast.textContent=message;
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),1800);
+}
+
+function saveData(){
+  localStorage.setItem("wb_lms_data", JSON.stringify(latestUserData));
+}
+
+function formatSeconds(sec){
+  const m=Math.floor(sec/60);
+  const s=sec%60;
+  return m ? `${m}분 ${s}초` : `${s}초`;
+}
+
+function getYoutubeId(url){
+  const m=String(url||"").match(/embed\/([^?&]+)/);
+  return m ? m[1] : "ysz5S6PUM-U";
+}
+
+function getPercent(){
+  return Math.round(((latestUserData.completedCourseIds || []).length / COURSES.length) * 100);
+}
+
+function renderDashboard(){
+  const completed=(latestUserData.completedCourseIds || []).length;
+  const percent=getPercent();
+  document.getElementById("totalCourses").textContent=COURSES.length;
+  document.getElementById("completedCourses").textContent=completed;
+  document.getElementById("progressValue").textContent=percent+"%";
+  document.getElementById("mainProgress").style.width=percent+"%";
+  document.getElementById("pointValue").textContent=(completed*1000).toLocaleString();
+}
+
+function renderCourses(){
+  const completed=latestUserData.completedCourseIds || [];
+  const grid=document.getElementById("courseGrid");
+  grid.innerHTML=COURSES.map(course=>{
+    const done=completed.includes(course.id);
+    const locked=course.required && !completed.includes(course.required);
+    return `
+      <article class="course-card ${done ? "completed" : ""}">
+        <div class="course-thumb"><span class="badge">${course.level}</span><img src="${getCourseImage(course.id)}" alt="${course.title}" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="course-body">
+          <div class="course-title"><span>${course.title}</span><span class="check-mark">${done ? "✔" : ""}</span></div>
+          <p class="course-desc">${course.desc}</p>
+          <div class="course-progress"><div class="course-progress-bar" style="width:${done ? 100 : 0}%"></div></div>
+          <button class="watch-btn" type="button" ${locked ? "disabled" : ""} onclick="openVideo('${course.id}')">${done ? "다시 보기" : locked ? "잠금 상태" : "강의 시청"}</button>
+          ${locked ? '<div class="lock-text">이전 강의 완료 후 열립니다.</div>' : ""}
+        </div>
+      </article>`;
+  }).join("");
+}
+
+function createQuiz(course){
+  const t=course.title;
+  const d=course.desc;
+  return [
+    {question:`${t}에서 가장 핵심적으로 이해해야 할 내용은?`,options:[d,"개인 판단으로 처리","외부 공유","보고 생략"],answer:0},
+    {question:`${t} 업무를 진행할 때 가장 중요한 원칙은?`,options:["정확한 확인과 기록","빠른 임의 처리","구두 약속만 의존","보안 생략"],answer:0},
+    {question:`${t}와 관련해 고객에게 설명할 때 올바른 방식은?`,options:["쉽고 정확하게 설명한다","전문용어만 빠르게 말한다","질문을 무시한다","서류를 보여주지 않는다"],answer:0},
+    {question:`${t} 진행 중 정보가 맞지 않으면 어떻게 해야 하나?`,options:["업무를 멈추고 관리자에게 확인한다","그대로 진행한다","임의로 수정한다","고객에게 숨긴다"],answer:0},
+    {question:`${t}에서 기록을 남겨야 하는 이유는?`,options:["업무 추적과 책임 확인을 위해","형식만 맞추기 위해","개인 보관을 위해","외부 홍보를 위해"],answer:0},
+    {question:`${t}에서 개인정보 처리 원칙으로 맞는 것은?`,options:["필요한 범위에서 안전하게 처리한다","개인 메신저로 자유롭게 보낸다","외부에 공유한다","퇴사 후 보관한다"],answer:0},
+    {question:`${t} 업무에서 하면 안 되는 행동은?`,options:["무단 처리 또는 대리 서명","본인확인","서류 검수","관리자 보고"],answer:0},
+    {question:`${t} 완료 후 필요한 조치는?`,options:["결과와 특이사항을 보고한다","보고를 생략한다","서류를 개인 보관한다","관련 기록을 삭제한다"],answer:0},
+    {question:`${t}에서 판단이 애매할 때 올바른 대응은?`,options:["규정과 관리자 확인을 요청한다","혼자 결정한다","고객에게 숨긴다","무조건 진행한다"],answer:0},
+    {question:`${t}의 최종 목적에 가장 가까운 것은?`,options:["안전하고 정확한 자산 행정 처리","수익 보장 약속","비공식 처리","고객 정보 수집"],answer:0}
+  ];
+}
+
+function getCourse(id){
+  return COURSES.find(c=>c.id===id);
+}
+
+function openVideo(courseId){
+  const course=getCourse(courseId);
+  if(!course) return;
+
+  if(course.required && !(latestUserData.completedCourseIds || []).includes(course.required)){
+    showToast("이전 강의를 먼저 완료해주세요.");
+    return;
+  }
+
+  currentCourseId=courseId;
+  currentTime=0;
+  safeSeconds=0;
+  videoEnded=false;
+  quizMode=false;
+  quizCourseId=null;
+  quizIndex=0;
+
+  document.getElementById("videoBox").classList.remove("quiz-mode");
+  document.getElementById("videoTitle").textContent=course.title;
+  document.getElementById("watchTimeText").textContent="시청 시간 0초";
+  document.getElementById("videoModal").classList.add("active");
+
+  loadPlayer(course);
+  startProtection();
+}
+
+function loadPlayer(course){
+  const videoId=getYoutubeId(course.url);
+
+  function make(){
+    if(ytPlayer && ytPlayer.loadVideoById){
+      ytPlayer.loadVideoById(videoId);
+      setTimeout(()=>{
+        ytPlayer.setPlaybackRate(1);
+        ytPlayer.playVideo();
+      },300);
+      return;
+    }
+
+    ytPlayer=new YT.Player("videoFrame", {
+      videoId,
+      playerVars:{autoplay:1,controls:1,disablekb:1,fs:0,rel:0,modestbranding:1,playsinline:1},
+      events:{
+        onReady:function(e){e.target.setPlaybackRate(1);e.target.playVideo();},
+        onStateChange:function(e){if(e.data===YT.PlayerState.ENDED) finishVideo();},
+        onPlaybackRateChange:function(e){if(e.target.getPlaybackRate()!==1) restartVideo("재생속도 조작이 감지되어 처음부터 다시 시작합니다.");}
       }
-];
+    });
+  }
 
-    let currentCourseId = null;
-    let videoInterval = null;
-    let currentTime = 0;
-    let latestUserData = { completedCourseIds:[], videoProgress:{} };
+  if(!window.YT || !YT.Player) setTimeout(make,500); else make();
+}
 
-    function toggleMenu(){ document.getElementById('navMenu').classList.toggle('active'); }
-    function showToast(message){ const toast=document.getElementById('toast'); toast.textContent=message; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),1800); }
-    function formatSeconds(sec){ const m=Math.floor(sec/60); const s=sec%60; return m ? `${m}분 ${s}초` : `${s}초`; }
-    function getProgressPercent(data){ const total = COURSES.length || 1; const completed = data.completedCourseIds?.length || data.completedCourses || 0; return Math.min(100, Math.round((completed / total) * 100)); }
+function startProtection(){
+  clearInterval(videoTimer);
+  clearInterval(guardTimer);
 
-    function renderCourses(data = latestUserData){
-      latestUserData = data || latestUserData;
-      const completed = latestUserData.completedCourseIds || [];
-      const progress = latestUserData.videoProgress || {};
-      const grid = document.getElementById('courseGrid');
-
-      grid.innerHTML = COURSES.map(course => {
-        const isDone = completed.includes(course.id);
-        const isLocked = course.required && !completed.includes(course.required);
-        const watched = Math.min(course.duration, progress[course.id] || 0);
-        const percent = isDone ? 100 : Math.round((watched / course.duration) * 100);
-        return `
-          <article class="course-card ${isDone ? 'completed' : ''} ${isLocked ? 'locked' : ''}" data-course-id="${course.id}">
-            <div class="course-thumb"><span class="badge">${course.level}</span>${course.icon}</div>
-            <div class="course-body">
-              <div class="course-title"><span>${course.title}</span><span class="check-mark">${isDone ? '✔' : ''}</span></div>
-              <p class="course-desc">${course.desc}</p>
-              <div class="course-progress"><div class="course-progress-bar" style="width:${percent}%"></div></div>
-              <button class="watch-btn" type="button" ${isLocked ? 'disabled' : ''} onclick="openVideo('${course.id}')">${isDone ? '다시 보기' : isLocked ? '잠금 상태' : watched ? '이어보기' : '강의 시청'}</button>
-              ${isLocked ? '<div class="lock-text">이전 강의 완료 후 열립니다.</div>' : ''}
-            </div>
-          </article>`;
-      }).join('');
-    }
-
-    function updateDashboard(data = latestUserData){
-      const completedIds = data.completedCourseIds || [];
-      const completed = completedIds.length || data.completedCourses || 0;
-      const percent = getProgressPercent(data);
-
-      document.getElementById('totalCourses').textContent = COURSES.length;
-      document.getElementById('completedCourses').textContent = completed;
-      document.getElementById('progressValue').textContent = `${percent}%`;
-      document.querySelector('.progress').style.width = `${percent}%`;
-      document.querySelector('.progress-text').textContent = `${percent}% 완료`;
-      document.getElementById('pointValue').textContent = (data.point || completed * 1000 || 0).toLocaleString();
-    }
-
-    async function openVideo(courseId){
-      const course = COURSES.find(c => c.id === courseId);
-      if(!course) return;
-      if(course.required && !(latestUserData.completedCourseIds || []).includes(course.required)){
-        showToast('이전 강의를 먼저 완료해주세요.');
-        return;
-      }
-
-      currentCourseId = courseId;
-      currentTime = latestUserData.videoProgress?.[courseId] || 0;
-      document.getElementById('videoTitle').textContent = course.title;
-      document.getElementById('watchTimeText').textContent = `시청 시간 ${formatSeconds(currentTime)}`;
-      document.getElementById('videoFrame').src = course.url;
-      document.getElementById('videoModal').classList.add('active');
-
-      if(window.userRef && window.updateDoc){
-        await window.updateDoc(window.userRef, { currentCourse: courseId, currentCourseTitle: course.title, lastSeen: Date.now() });
-      }
-      startTracking(course);
-    }
-
-    function startTracking(course){
-      clearInterval(videoInterval);
-      videoInterval = setInterval(async () => {
-        currentTime += 1;
-        document.getElementById('watchTimeText').textContent = `시청 시간 ${formatSeconds(currentTime)}`;
-
-        if(currentTime % 5 === 0 && window.userRef && window.updateDoc){
-          await window.updateDoc(window.userRef, { [`videoProgress.${currentCourseId}`]: currentTime, lastSeen: Date.now() });
-        }
-        if(currentTime >= course.duration){ await markAsCompleted(); }
-      }, 1000);
-    }
-
-    async function markAsCompleted(){
-      if(!currentCourseId) return;
-      if((latestUserData.completedCourseIds || []).includes(currentCourseId)) return;
-
-      if(window.userRef && window.updateDoc && window.arrayUnion && window.increment){
-        await window.updateDoc(window.userRef, { completedCourseIds: window.arrayUnion(currentCourseId), completedCourses: window.increment(1), point: window.increment(1000) });
-      }
-
-      latestUserData.completedCourseIds = [...(latestUserData.completedCourseIds || []), currentCourseId];
-      latestUserData.completedCourses = latestUserData.completedCourseIds.length;
-      latestUserData.point = (latestUserData.point || 0) + 1000;
-      updateDashboard(latestUserData);
-      renderCourses(latestUserData);
-      showToast('강의가 완료 처리되었습니다. +1,000P');
-    }
-
-    async function closeVideo(){
-      document.getElementById('videoFrame').src = '';
-      document.getElementById('videoModal').classList.remove('active');
-      clearInterval(videoInterval);
-
-      if(currentCourseId){
-        latestUserData.videoProgress = latestUserData.videoProgress || {};
-        latestUserData.videoProgress[currentCourseId] = currentTime;
-        if(window.userRef && window.updateDoc){
-          await window.updateDoc(window.userRef, { [`videoProgress.${currentCourseId}`]: currentTime, currentCourse:null, currentCourseTitle:null, lastSeen:Date.now() });
-        }
-        renderCourses(latestUserData);
-      }
-      currentCourseId = null;
-      currentTime = 0;
-    }
-
-    function scrollToContinue(){
-      const progress = latestUserData.videoProgress || {};
-      const next = COURSES.find(c => !(latestUserData.completedCourseIds || []).includes(c.id) && (!c.required || (latestUserData.completedCourseIds || []).includes(c.required))) || COURSES[0];
-      document.querySelector(`[data-course-id="${next.id}"]`)?.scrollIntoView({behavior:'smooth',block:'center'});
-    }
-
-
-
-    const QUIZ_QUESTIONS = [
-      {
-            "category": "증권 기초",
-            "question": "1. 주식의 기본 개념으로 가장 올바른 것은?",
-            "options": [
-                  "회사의 소유권 일부를 나타내는 증권",
-                  "은행 예금 통장",
-                  "세금 납부 영수증",
-                  "부동산 등기부 자체"
-            ],
-            "answer": 0,
-            "explanation": "주식은 회사의 지분을 나타내며 주주는 보유 지분에 따라 권리를 가질 수 있습니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 기초",
-            "question": "2. 채권에 대한 설명으로 올바른 것은?",
-            "options": [
-                  "회사가 발행한 상품권",
-                  "일정 조건으로 원금과 이자를 지급하기로 한 채무 증권",
-                  "주식 매매 주문서",
-                  "보험 청약서"
-            ],
-            "answer": 1,
-            "explanation": "채권은 발행자가 투자자에게 원금과 이자를 지급할 의무를 지는 증권입니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 기초",
-            "question": "3. 펀드의 특징으로 가장 적절한 것은?",
-            "options": [
-                  "여러 투자자의 돈을 모아 전문가가 운용한다",
-                  "항상 원금이 보장된다",
-                  "주식만 살 수 있다",
-                  "개인 간 현금 전달 방식이다"
-            ],
-            "answer": 0,
-            "explanation": "펀드는 투자금을 모아 운용하지만 상품에 따라 손실 가능성이 있습니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 계좌",
-            "question": "4. 증권계좌 개설 시 가장 중요한 확인 사항은?",
-            "options": [
-                  "본인확인과 고객정보 정확성",
-                  "추천 종목 개수",
-                  "휴대폰 배경화면",
-                  "고객의 취미"
-            ],
-            "answer": 0,
-            "explanation": "금융거래는 본인확인과 정확한 고객정보 확인이 기본입니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "명의이전",
-            "question": "5. 주식 명의이전 업무에서 먼저 확인해야 하는 것은?",
-            "options": [
-                  "서류의 당사자와 대상 증권 정보",
-                  "고객의 사적인 일정",
-                  "주가 예측 자료",
-                  "SNS 게시물"
-            ],
-            "answer": 0,
-            "explanation": "명의이전은 당사자, 대상 증권, 수량, 서명 등 핵심 정보 확인이 중요합니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "명의이전",
-            "question": "6. 서류상 이름과 신분증 이름이 다를 때 올바른 조치는?",
-            "options": [
-                  "임의로 수정한다",
-                  "그대로 진행한다",
-                  "업무를 중단하고 관리자에게 확인한다",
-                  "서명을 대신한다"
-            ],
-            "answer": 2,
-            "explanation": "불일치가 있으면 임의 처리하지 않고 확인 절차를 거쳐야 합니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "고객 응대",
-            "question": "7. 고객 방문 전 가장 적절한 준비는?",
-            "options": [
-                  "방문 목적·시간·필요 서류를 사전 확인한다",
-                  "아무 연락 없이 방문한다",
-                  "고객 정보를 외부에 공유한다",
-                  "서류 없이 방문한다"
-            ],
-            "answer": 0,
-            "explanation": "방문 전 일정과 준비물을 명확히 확인해야 민원을 예방할 수 있습니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "고객 응대",
-            "question": "8. 고객에게 업무를 설명할 때 가장 바람직한 태도는?",
-            "options": [
-                  "전문용어만 빠르게 말한다",
-                  "쉽고 정확하게 설명하고 질문을 확인한다",
-                  "불필요한 압박을 준다",
-                  "서류를 보여주지 않는다"
-            ],
-            "answer": 1,
-            "explanation": "고객이 이해할 수 있게 설명하고 동의 여부를 명확히 확인해야 합니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "서류 검수",
-            "question": "9. 서명·날인 확인 시 올바른 방법은?",
-            "options": [
-                  "필수 위치와 이름, 날짜를 함께 확인한다",
-                  "빈칸은 무조건 넘어간다",
-                  "대신 서명한다",
-                  "사진만 찍고 폐기한다"
-            ],
-            "answer": 0,
-            "explanation": "서명·날인·날짜·필수 기재사항을 함께 확인해야 합니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "서류 검수",
-            "question": "10. 필수 서류가 누락되었을 때 해야 할 일은?",
-            "options": [
-                  "임의로 대체한다",
-                  "누락 사실을 기록하고 보완 요청한다",
-                  "고객 몰래 작성한다",
-                  "서류를 폐기한다"
-            ],
-            "answer": 1,
-            "explanation": "누락 서류는 기록 후 공식 절차에 따라 보완해야 합니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "인수인계",
-            "question": "11. 서류나 자산 인계 시 가장 중요한 것은?",
-            "options": [
-                  "인계 일시·대상·수량·상태를 기록한다",
-                  "기억에만 의존한다",
-                  "개인 차량에 장기 보관한다",
-                  "사진을 SNS에 올린다"
-            ],
-            "answer": 0,
-            "explanation": "인수인계는 추적 가능하도록 기록과 확인 절차를 남겨야 합니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "인수인계",
-            "question": "12. 업무 중 중요한 원본 서류를 보관할 때 올바른 원칙은?",
-            "options": [
-                  "지정된 보관 방식과 전달 기한을 따른다",
-                  "개인 가방에 오래 보관한다",
-                  "가족에게 맡긴다",
-                  "카페에 두고 간다"
-            ],
-            "answer": 0,
-            "explanation": "원본 서류는 분실·훼손 방지를 위해 내부 규정에 따라 관리해야 합니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "개인정보보호",
-            "question": "13. 고객 신분증 사진을 개인 메신저로 전송해도 되는가?",
-            "options": [
-                  "항상 가능하다",
-                  "업무 편의를 위해 가능하다",
-                  "내부 승인된 안전한 절차가 아니면 금지된다",
-                  "친한 직원에게는 가능하다"
-            ],
-            "answer": 2,
-            "explanation": "개인정보는 승인된 시스템과 절차 안에서만 처리해야 합니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "개인정보보호",
-            "question": "14. 개인정보 처리의 기본 원칙은?",
-            "options": [
-                  "필요한 범위에서만 수집·이용한다",
-                  "많이 모을수록 좋다",
-                  "외부에 자유롭게 공유한다",
-                  "퇴사 후에도 보관한다"
-            ],
-            "answer": 0,
-            "explanation": "개인정보는 목적에 필요한 최소 범위에서 처리해야 합니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "컴플라이언스",
-            "question": "15. 업무 지시가 내부 규정과 다르게 느껴질 때 올바른 대응은?",
-            "options": [
-                  "무조건 따른다",
-                  "규정과 관리자 확인을 요청한다",
-                  "고객에게 숨긴다",
-                  "개인 판단으로 생략한다"
-            ],
-            "answer": 1,
-            "explanation": "규정과 다를 가능성이 있으면 즉시 확인하고 기록해야 합니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "컴플라이언스",
-            "question": "16. 금융 관련 업무에서 하면 안 되는 행동은?",
-            "options": [
-                  "확인된 절차에 따라 안내",
-                  "고객에게 특정 투자수익을 보장한다고 말하기",
-                  "서류 누락 보고",
-                  "개인정보 보호"
-            ],
-            "answer": 1,
-            "explanation": "수익 보장, 허위·과장 설명, 무자격 투자권유는 위험합니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "출장 업무",
-            "question": "17. 출장 업무 후 필수 보고 내용으로 적절한 것은?",
-            "options": [
-                  "방문 결과, 수령 서류, 특이사항",
-                  "점심 메뉴만 보고",
-                  "고객 사생활 평가",
-                  "보고 생략"
-            ],
-            "answer": 0,
-            "explanation": "업무 보고에는 결과와 특이사항이 포함되어야 합니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "출장 업무",
-            "question": "18. 교통비·출장비 정산 시 올바른 태도는?",
-            "options": [
-                  "실제 사용 내역과 기준에 맞게 신청한다",
-                  "사용하지 않은 금액도 청구한다",
-                  "영수증을 조작한다",
-                  "타인 내역을 사용한다"
-            ],
-            "answer": 0,
-            "explanation": "정산은 실제 지출과 회사 기준에 맞아야 합니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "리스크 관리",
-            "question": "19. 고객이 서류 내용을 이해하지 못했다고 말할 때 조치는?",
-            "options": [
-                  "무시하고 서명받는다",
-                  "설명을 중단하고 집으로 간다",
-                  "충분히 설명하고 필요 시 담당자 확인을 연결한다",
-                  "대신 결정한다"
-            ],
-            "answer": 2,
-            "explanation": "고객 이해와 자발적 동의가 중요합니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "리스크 관리",
-            "question": "20. 분실 사고가 발생했을 때 가장 먼저 해야 할 일은?",
-            "options": [
-                  "숨긴다",
-                  "즉시 관리자에게 보고하고 사고 절차를 따른다",
-                  "나중에 기억나면 말한다",
-                  "임의로 새로 만든다"
-            ],
-            "answer": 1,
-            "explanation": "분실·오류·사고는 즉시 보고해야 피해를 줄일 수 있습니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "자산 행정",
-            "question": "21. 자산 행정 매니저의 역할로 가장 적절한 것은?",
-            "options": [
-                  "정해진 절차에 따라 서류 안내와 확인을 지원한다",
-                  "고객 자산을 임의로 운용한다",
-                  "투자를 강요한다",
-                  "법률 판단을 대신한다"
-            ],
-            "answer": 0,
-            "explanation": "역할 범위 내에서 안내·확인·전달 업무를 수행해야 합니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "자산 행정",
-            "question": "22. 고객 동의 없이 진행해도 되는 업무는?",
-            "options": [
-                  "없다",
-                  "단순 서명은 가능하다",
-                  "급하면 가능하다",
-                  "상사가 말하면 가능하다"
-            ],
-            "answer": 0,
-            "explanation": "고객 동의와 공식 절차 없이 진행하면 안 됩니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 실무",
-            "question": "23. 주식 수량 기재 오류를 발견했을 때 대응은?",
-            "options": [
-                  "수정액으로 임의 수정",
-                  "그대로 제출",
-                  "오류를 표시하고 재확인·보완 절차를 진행",
-                  "고객에게 말하지 않는다"
-            ],
-            "answer": 2,
-            "explanation": "수량 오류는 권리관계에 영향을 줄 수 있어 반드시 재확인해야 합니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 실무",
-            "question": "24. 증권 관련 서류에서 날짜가 중요한 이유는?",
-            "options": [
-                  "절차의 효력과 처리 순서를 확인하기 위해",
-                  "글씨가 예뻐 보이기 위해",
-                  "파일명을 만들기 위해",
-                  "필수 사항이 아니다"
-            ],
-            "answer": 0,
-            "explanation": "날짜는 동의 시점과 처리 흐름을 판단하는 중요한 정보입니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "최종 평가",
-            "question": "25. 업무 수행의 가장 기본 원칙은?",
-            "options": [
-                  "정확성, 투명성, 기록, 보안",
-                  "속도만 중요",
-                  "구두 약속만 중요",
-                  "비공식 처리 우선"
-            ],
-            "answer": 0,
-            "explanation": "자산 행정 업무는 정확한 확인, 투명한 설명, 기록, 보안이 핵심입니다. 반복 학습 2회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 기초",
-            "question": "26. 주식의 기본 개념으로 가장 올바른 것은?",
-            "options": [
-                  "회사의 소유권 일부를 나타내는 증권",
-                  "은행 예금 통장",
-                  "세금 납부 영수증",
-                  "부동산 등기부 자체"
-            ],
-            "answer": 0,
-            "explanation": "주식은 회사의 지분을 나타내며 주주는 보유 지분에 따라 권리를 가질 수 있습니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 기초",
-            "question": "27. 채권에 대한 설명으로 올바른 것은?",
-            "options": [
-                  "회사가 발행한 상품권",
-                  "일정 조건으로 원금과 이자를 지급하기로 한 채무 증권",
-                  "주식 매매 주문서",
-                  "보험 청약서"
-            ],
-            "answer": 1,
-            "explanation": "채권은 발행자가 투자자에게 원금과 이자를 지급할 의무를 지는 증권입니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 기초",
-            "question": "28. 펀드의 특징으로 가장 적절한 것은?",
-            "options": [
-                  "여러 투자자의 돈을 모아 전문가가 운용한다",
-                  "항상 원금이 보장된다",
-                  "주식만 살 수 있다",
-                  "개인 간 현금 전달 방식이다"
-            ],
-            "answer": 0,
-            "explanation": "펀드는 투자금을 모아 운용하지만 상품에 따라 손실 가능성이 있습니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 계좌",
-            "question": "29. 증권계좌 개설 시 가장 중요한 확인 사항은?",
-            "options": [
-                  "본인확인과 고객정보 정확성",
-                  "추천 종목 개수",
-                  "휴대폰 배경화면",
-                  "고객의 취미"
-            ],
-            "answer": 0,
-            "explanation": "금융거래는 본인확인과 정확한 고객정보 확인이 기본입니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "명의이전",
-            "question": "30. 주식 명의이전 업무에서 먼저 확인해야 하는 것은?",
-            "options": [
-                  "서류의 당사자와 대상 증권 정보",
-                  "고객의 사적인 일정",
-                  "주가 예측 자료",
-                  "SNS 게시물"
-            ],
-            "answer": 0,
-            "explanation": "명의이전은 당사자, 대상 증권, 수량, 서명 등 핵심 정보 확인이 중요합니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "명의이전",
-            "question": "31. 서류상 이름과 신분증 이름이 다를 때 올바른 조치는?",
-            "options": [
-                  "임의로 수정한다",
-                  "그대로 진행한다",
-                  "업무를 중단하고 관리자에게 확인한다",
-                  "서명을 대신한다"
-            ],
-            "answer": 2,
-            "explanation": "불일치가 있으면 임의 처리하지 않고 확인 절차를 거쳐야 합니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "고객 응대",
-            "question": "32. 고객 방문 전 가장 적절한 준비는?",
-            "options": [
-                  "방문 목적·시간·필요 서류를 사전 확인한다",
-                  "아무 연락 없이 방문한다",
-                  "고객 정보를 외부에 공유한다",
-                  "서류 없이 방문한다"
-            ],
-            "answer": 0,
-            "explanation": "방문 전 일정과 준비물을 명확히 확인해야 민원을 예방할 수 있습니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "고객 응대",
-            "question": "33. 고객에게 업무를 설명할 때 가장 바람직한 태도는?",
-            "options": [
-                  "전문용어만 빠르게 말한다",
-                  "쉽고 정확하게 설명하고 질문을 확인한다",
-                  "불필요한 압박을 준다",
-                  "서류를 보여주지 않는다"
-            ],
-            "answer": 1,
-            "explanation": "고객이 이해할 수 있게 설명하고 동의 여부를 명확히 확인해야 합니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "서류 검수",
-            "question": "34. 서명·날인 확인 시 올바른 방법은?",
-            "options": [
-                  "필수 위치와 이름, 날짜를 함께 확인한다",
-                  "빈칸은 무조건 넘어간다",
-                  "대신 서명한다",
-                  "사진만 찍고 폐기한다"
-            ],
-            "answer": 0,
-            "explanation": "서명·날인·날짜·필수 기재사항을 함께 확인해야 합니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "서류 검수",
-            "question": "35. 필수 서류가 누락되었을 때 해야 할 일은?",
-            "options": [
-                  "임의로 대체한다",
-                  "누락 사실을 기록하고 보완 요청한다",
-                  "고객 몰래 작성한다",
-                  "서류를 폐기한다"
-            ],
-            "answer": 1,
-            "explanation": "누락 서류는 기록 후 공식 절차에 따라 보완해야 합니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "인수인계",
-            "question": "36. 서류나 자산 인계 시 가장 중요한 것은?",
-            "options": [
-                  "인계 일시·대상·수량·상태를 기록한다",
-                  "기억에만 의존한다",
-                  "개인 차량에 장기 보관한다",
-                  "사진을 SNS에 올린다"
-            ],
-            "answer": 0,
-            "explanation": "인수인계는 추적 가능하도록 기록과 확인 절차를 남겨야 합니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "인수인계",
-            "question": "37. 업무 중 중요한 원본 서류를 보관할 때 올바른 원칙은?",
-            "options": [
-                  "지정된 보관 방식과 전달 기한을 따른다",
-                  "개인 가방에 오래 보관한다",
-                  "가족에게 맡긴다",
-                  "카페에 두고 간다"
-            ],
-            "answer": 0,
-            "explanation": "원본 서류는 분실·훼손 방지를 위해 내부 규정에 따라 관리해야 합니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "개인정보보호",
-            "question": "38. 고객 신분증 사진을 개인 메신저로 전송해도 되는가?",
-            "options": [
-                  "항상 가능하다",
-                  "업무 편의를 위해 가능하다",
-                  "내부 승인된 안전한 절차가 아니면 금지된다",
-                  "친한 직원에게는 가능하다"
-            ],
-            "answer": 2,
-            "explanation": "개인정보는 승인된 시스템과 절차 안에서만 처리해야 합니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "개인정보보호",
-            "question": "39. 개인정보 처리의 기본 원칙은?",
-            "options": [
-                  "필요한 범위에서만 수집·이용한다",
-                  "많이 모을수록 좋다",
-                  "외부에 자유롭게 공유한다",
-                  "퇴사 후에도 보관한다"
-            ],
-            "answer": 0,
-            "explanation": "개인정보는 목적에 필요한 최소 범위에서 처리해야 합니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "컴플라이언스",
-            "question": "40. 업무 지시가 내부 규정과 다르게 느껴질 때 올바른 대응은?",
-            "options": [
-                  "무조건 따른다",
-                  "규정과 관리자 확인을 요청한다",
-                  "고객에게 숨긴다",
-                  "개인 판단으로 생략한다"
-            ],
-            "answer": 1,
-            "explanation": "규정과 다를 가능성이 있으면 즉시 확인하고 기록해야 합니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "컴플라이언스",
-            "question": "41. 금융 관련 업무에서 하면 안 되는 행동은?",
-            "options": [
-                  "확인된 절차에 따라 안내",
-                  "고객에게 특정 투자수익을 보장한다고 말하기",
-                  "서류 누락 보고",
-                  "개인정보 보호"
-            ],
-            "answer": 1,
-            "explanation": "수익 보장, 허위·과장 설명, 무자격 투자권유는 위험합니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "출장 업무",
-            "question": "42. 출장 업무 후 필수 보고 내용으로 적절한 것은?",
-            "options": [
-                  "방문 결과, 수령 서류, 특이사항",
-                  "점심 메뉴만 보고",
-                  "고객 사생활 평가",
-                  "보고 생략"
-            ],
-            "answer": 0,
-            "explanation": "업무 보고에는 결과와 특이사항이 포함되어야 합니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "출장 업무",
-            "question": "43. 교통비·출장비 정산 시 올바른 태도는?",
-            "options": [
-                  "실제 사용 내역과 기준에 맞게 신청한다",
-                  "사용하지 않은 금액도 청구한다",
-                  "영수증을 조작한다",
-                  "타인 내역을 사용한다"
-            ],
-            "answer": 0,
-            "explanation": "정산은 실제 지출과 회사 기준에 맞아야 합니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "리스크 관리",
-            "question": "44. 고객이 서류 내용을 이해하지 못했다고 말할 때 조치는?",
-            "options": [
-                  "무시하고 서명받는다",
-                  "설명을 중단하고 집으로 간다",
-                  "충분히 설명하고 필요 시 담당자 확인을 연결한다",
-                  "대신 결정한다"
-            ],
-            "answer": 2,
-            "explanation": "고객 이해와 자발적 동의가 중요합니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "리스크 관리",
-            "question": "45. 분실 사고가 발생했을 때 가장 먼저 해야 할 일은?",
-            "options": [
-                  "숨긴다",
-                  "즉시 관리자에게 보고하고 사고 절차를 따른다",
-                  "나중에 기억나면 말한다",
-                  "임의로 새로 만든다"
-            ],
-            "answer": 1,
-            "explanation": "분실·오류·사고는 즉시 보고해야 피해를 줄일 수 있습니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "자산 행정",
-            "question": "46. 자산 행정 매니저의 역할로 가장 적절한 것은?",
-            "options": [
-                  "정해진 절차에 따라 서류 안내와 확인을 지원한다",
-                  "고객 자산을 임의로 운용한다",
-                  "투자를 강요한다",
-                  "법률 판단을 대신한다"
-            ],
-            "answer": 0,
-            "explanation": "역할 범위 내에서 안내·확인·전달 업무를 수행해야 합니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "자산 행정",
-            "question": "47. 고객 동의 없이 진행해도 되는 업무는?",
-            "options": [
-                  "없다",
-                  "단순 서명은 가능하다",
-                  "급하면 가능하다",
-                  "상사가 말하면 가능하다"
-            ],
-            "answer": 0,
-            "explanation": "고객 동의와 공식 절차 없이 진행하면 안 됩니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 실무",
-            "question": "48. 주식 수량 기재 오류를 발견했을 때 대응은?",
-            "options": [
-                  "수정액으로 임의 수정",
-                  "그대로 제출",
-                  "오류를 표시하고 재확인·보완 절차를 진행",
-                  "고객에게 말하지 않는다"
-            ],
-            "answer": 2,
-            "explanation": "수량 오류는 권리관계에 영향을 줄 수 있어 반드시 재확인해야 합니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 실무",
-            "question": "49. 증권 관련 서류에서 날짜가 중요한 이유는?",
-            "options": [
-                  "절차의 효력과 처리 순서를 확인하기 위해",
-                  "글씨가 예뻐 보이기 위해",
-                  "파일명을 만들기 위해",
-                  "필수 사항이 아니다"
-            ],
-            "answer": 0,
-            "explanation": "날짜는 동의 시점과 처리 흐름을 판단하는 중요한 정보입니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "최종 평가",
-            "question": "50. 업무 수행의 가장 기본 원칙은?",
-            "options": [
-                  "정확성, 투명성, 기록, 보안",
-                  "속도만 중요",
-                  "구두 약속만 중요",
-                  "비공식 처리 우선"
-            ],
-            "answer": 0,
-            "explanation": "자산 행정 업무는 정확한 확인, 투명한 설명, 기록, 보안이 핵심입니다. 반복 학습 3회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 기초",
-            "question": "51. 주식의 기본 개념으로 가장 올바른 것은?",
-            "options": [
-                  "회사의 소유권 일부를 나타내는 증권",
-                  "은행 예금 통장",
-                  "세금 납부 영수증",
-                  "부동산 등기부 자체"
-            ],
-            "answer": 0,
-            "explanation": "주식은 회사의 지분을 나타내며 주주는 보유 지분에 따라 권리를 가질 수 있습니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 기초",
-            "question": "52. 채권에 대한 설명으로 올바른 것은?",
-            "options": [
-                  "회사가 발행한 상품권",
-                  "일정 조건으로 원금과 이자를 지급하기로 한 채무 증권",
-                  "주식 매매 주문서",
-                  "보험 청약서"
-            ],
-            "answer": 1,
-            "explanation": "채권은 발행자가 투자자에게 원금과 이자를 지급할 의무를 지는 증권입니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 기초",
-            "question": "53. 펀드의 특징으로 가장 적절한 것은?",
-            "options": [
-                  "여러 투자자의 돈을 모아 전문가가 운용한다",
-                  "항상 원금이 보장된다",
-                  "주식만 살 수 있다",
-                  "개인 간 현금 전달 방식이다"
-            ],
-            "answer": 0,
-            "explanation": "펀드는 투자금을 모아 운용하지만 상품에 따라 손실 가능성이 있습니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 계좌",
-            "question": "54. 증권계좌 개설 시 가장 중요한 확인 사항은?",
-            "options": [
-                  "본인확인과 고객정보 정확성",
-                  "추천 종목 개수",
-                  "휴대폰 배경화면",
-                  "고객의 취미"
-            ],
-            "answer": 0,
-            "explanation": "금융거래는 본인확인과 정확한 고객정보 확인이 기본입니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "명의이전",
-            "question": "55. 주식 명의이전 업무에서 먼저 확인해야 하는 것은?",
-            "options": [
-                  "서류의 당사자와 대상 증권 정보",
-                  "고객의 사적인 일정",
-                  "주가 예측 자료",
-                  "SNS 게시물"
-            ],
-            "answer": 0,
-            "explanation": "명의이전은 당사자, 대상 증권, 수량, 서명 등 핵심 정보 확인이 중요합니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "명의이전",
-            "question": "56. 서류상 이름과 신분증 이름이 다를 때 올바른 조치는?",
-            "options": [
-                  "임의로 수정한다",
-                  "그대로 진행한다",
-                  "업무를 중단하고 관리자에게 확인한다",
-                  "서명을 대신한다"
-            ],
-            "answer": 2,
-            "explanation": "불일치가 있으면 임의 처리하지 않고 확인 절차를 거쳐야 합니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "고객 응대",
-            "question": "57. 고객 방문 전 가장 적절한 준비는?",
-            "options": [
-                  "방문 목적·시간·필요 서류를 사전 확인한다",
-                  "아무 연락 없이 방문한다",
-                  "고객 정보를 외부에 공유한다",
-                  "서류 없이 방문한다"
-            ],
-            "answer": 0,
-            "explanation": "방문 전 일정과 준비물을 명확히 확인해야 민원을 예방할 수 있습니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "고객 응대",
-            "question": "58. 고객에게 업무를 설명할 때 가장 바람직한 태도는?",
-            "options": [
-                  "전문용어만 빠르게 말한다",
-                  "쉽고 정확하게 설명하고 질문을 확인한다",
-                  "불필요한 압박을 준다",
-                  "서류를 보여주지 않는다"
-            ],
-            "answer": 1,
-            "explanation": "고객이 이해할 수 있게 설명하고 동의 여부를 명확히 확인해야 합니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "서류 검수",
-            "question": "59. 서명·날인 확인 시 올바른 방법은?",
-            "options": [
-                  "필수 위치와 이름, 날짜를 함께 확인한다",
-                  "빈칸은 무조건 넘어간다",
-                  "대신 서명한다",
-                  "사진만 찍고 폐기한다"
-            ],
-            "answer": 0,
-            "explanation": "서명·날인·날짜·필수 기재사항을 함께 확인해야 합니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "서류 검수",
-            "question": "60. 필수 서류가 누락되었을 때 해야 할 일은?",
-            "options": [
-                  "임의로 대체한다",
-                  "누락 사실을 기록하고 보완 요청한다",
-                  "고객 몰래 작성한다",
-                  "서류를 폐기한다"
-            ],
-            "answer": 1,
-            "explanation": "누락 서류는 기록 후 공식 절차에 따라 보완해야 합니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "인수인계",
-            "question": "61. 서류나 자산 인계 시 가장 중요한 것은?",
-            "options": [
-                  "인계 일시·대상·수량·상태를 기록한다",
-                  "기억에만 의존한다",
-                  "개인 차량에 장기 보관한다",
-                  "사진을 SNS에 올린다"
-            ],
-            "answer": 0,
-            "explanation": "인수인계는 추적 가능하도록 기록과 확인 절차를 남겨야 합니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "인수인계",
-            "question": "62. 업무 중 중요한 원본 서류를 보관할 때 올바른 원칙은?",
-            "options": [
-                  "지정된 보관 방식과 전달 기한을 따른다",
-                  "개인 가방에 오래 보관한다",
-                  "가족에게 맡긴다",
-                  "카페에 두고 간다"
-            ],
-            "answer": 0,
-            "explanation": "원본 서류는 분실·훼손 방지를 위해 내부 규정에 따라 관리해야 합니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "개인정보보호",
-            "question": "63. 고객 신분증 사진을 개인 메신저로 전송해도 되는가?",
-            "options": [
-                  "항상 가능하다",
-                  "업무 편의를 위해 가능하다",
-                  "내부 승인된 안전한 절차가 아니면 금지된다",
-                  "친한 직원에게는 가능하다"
-            ],
-            "answer": 2,
-            "explanation": "개인정보는 승인된 시스템과 절차 안에서만 처리해야 합니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "개인정보보호",
-            "question": "64. 개인정보 처리의 기본 원칙은?",
-            "options": [
-                  "필요한 범위에서만 수집·이용한다",
-                  "많이 모을수록 좋다",
-                  "외부에 자유롭게 공유한다",
-                  "퇴사 후에도 보관한다"
-            ],
-            "answer": 0,
-            "explanation": "개인정보는 목적에 필요한 최소 범위에서 처리해야 합니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "컴플라이언스",
-            "question": "65. 업무 지시가 내부 규정과 다르게 느껴질 때 올바른 대응은?",
-            "options": [
-                  "무조건 따른다",
-                  "규정과 관리자 확인을 요청한다",
-                  "고객에게 숨긴다",
-                  "개인 판단으로 생략한다"
-            ],
-            "answer": 1,
-            "explanation": "규정과 다를 가능성이 있으면 즉시 확인하고 기록해야 합니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "컴플라이언스",
-            "question": "66. 금융 관련 업무에서 하면 안 되는 행동은?",
-            "options": [
-                  "확인된 절차에 따라 안내",
-                  "고객에게 특정 투자수익을 보장한다고 말하기",
-                  "서류 누락 보고",
-                  "개인정보 보호"
-            ],
-            "answer": 1,
-            "explanation": "수익 보장, 허위·과장 설명, 무자격 투자권유는 위험합니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "출장 업무",
-            "question": "67. 출장 업무 후 필수 보고 내용으로 적절한 것은?",
-            "options": [
-                  "방문 결과, 수령 서류, 특이사항",
-                  "점심 메뉴만 보고",
-                  "고객 사생활 평가",
-                  "보고 생략"
-            ],
-            "answer": 0,
-            "explanation": "업무 보고에는 결과와 특이사항이 포함되어야 합니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "출장 업무",
-            "question": "68. 교통비·출장비 정산 시 올바른 태도는?",
-            "options": [
-                  "실제 사용 내역과 기준에 맞게 신청한다",
-                  "사용하지 않은 금액도 청구한다",
-                  "영수증을 조작한다",
-                  "타인 내역을 사용한다"
-            ],
-            "answer": 0,
-            "explanation": "정산은 실제 지출과 회사 기준에 맞아야 합니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "리스크 관리",
-            "question": "69. 고객이 서류 내용을 이해하지 못했다고 말할 때 조치는?",
-            "options": [
-                  "무시하고 서명받는다",
-                  "설명을 중단하고 집으로 간다",
-                  "충분히 설명하고 필요 시 담당자 확인을 연결한다",
-                  "대신 결정한다"
-            ],
-            "answer": 2,
-            "explanation": "고객 이해와 자발적 동의가 중요합니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "리스크 관리",
-            "question": "70. 분실 사고가 발생했을 때 가장 먼저 해야 할 일은?",
-            "options": [
-                  "숨긴다",
-                  "즉시 관리자에게 보고하고 사고 절차를 따른다",
-                  "나중에 기억나면 말한다",
-                  "임의로 새로 만든다"
-            ],
-            "answer": 1,
-            "explanation": "분실·오류·사고는 즉시 보고해야 피해를 줄일 수 있습니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "자산 행정",
-            "question": "71. 자산 행정 매니저의 역할로 가장 적절한 것은?",
-            "options": [
-                  "정해진 절차에 따라 서류 안내와 확인을 지원한다",
-                  "고객 자산을 임의로 운용한다",
-                  "투자를 강요한다",
-                  "법률 판단을 대신한다"
-            ],
-            "answer": 0,
-            "explanation": "역할 범위 내에서 안내·확인·전달 업무를 수행해야 합니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "자산 행정",
-            "question": "72. 고객 동의 없이 진행해도 되는 업무는?",
-            "options": [
-                  "없다",
-                  "단순 서명은 가능하다",
-                  "급하면 가능하다",
-                  "상사가 말하면 가능하다"
-            ],
-            "answer": 0,
-            "explanation": "고객 동의와 공식 절차 없이 진행하면 안 됩니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 실무",
-            "question": "73. 주식 수량 기재 오류를 발견했을 때 대응은?",
-            "options": [
-                  "수정액으로 임의 수정",
-                  "그대로 제출",
-                  "오류를 표시하고 재확인·보완 절차를 진행",
-                  "고객에게 말하지 않는다"
-            ],
-            "answer": 2,
-            "explanation": "수량 오류는 권리관계에 영향을 줄 수 있어 반드시 재확인해야 합니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 실무",
-            "question": "74. 증권 관련 서류에서 날짜가 중요한 이유는?",
-            "options": [
-                  "절차의 효력과 처리 순서를 확인하기 위해",
-                  "글씨가 예뻐 보이기 위해",
-                  "파일명을 만들기 위해",
-                  "필수 사항이 아니다"
-            ],
-            "answer": 0,
-            "explanation": "날짜는 동의 시점과 처리 흐름을 판단하는 중요한 정보입니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "최종 평가",
-            "question": "75. 업무 수행의 가장 기본 원칙은?",
-            "options": [
-                  "정확성, 투명성, 기록, 보안",
-                  "속도만 중요",
-                  "구두 약속만 중요",
-                  "비공식 처리 우선"
-            ],
-            "answer": 0,
-            "explanation": "자산 행정 업무는 정확한 확인, 투명한 설명, 기록, 보안이 핵심입니다. 반복 학습 4회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 기초",
-            "question": "76. 주식의 기본 개념으로 가장 올바른 것은?",
-            "options": [
-                  "회사의 소유권 일부를 나타내는 증권",
-                  "은행 예금 통장",
-                  "세금 납부 영수증",
-                  "부동산 등기부 자체"
-            ],
-            "answer": 0,
-            "explanation": "주식은 회사의 지분을 나타내며 주주는 보유 지분에 따라 권리를 가질 수 있습니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 기초",
-            "question": "77. 채권에 대한 설명으로 올바른 것은?",
-            "options": [
-                  "회사가 발행한 상품권",
-                  "일정 조건으로 원금과 이자를 지급하기로 한 채무 증권",
-                  "주식 매매 주문서",
-                  "보험 청약서"
-            ],
-            "answer": 1,
-            "explanation": "채권은 발행자가 투자자에게 원금과 이자를 지급할 의무를 지는 증권입니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 기초",
-            "question": "78. 펀드의 특징으로 가장 적절한 것은?",
-            "options": [
-                  "여러 투자자의 돈을 모아 전문가가 운용한다",
-                  "항상 원금이 보장된다",
-                  "주식만 살 수 있다",
-                  "개인 간 현금 전달 방식이다"
-            ],
-            "answer": 0,
-            "explanation": "펀드는 투자금을 모아 운용하지만 상품에 따라 손실 가능성이 있습니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 계좌",
-            "question": "79. 증권계좌 개설 시 가장 중요한 확인 사항은?",
-            "options": [
-                  "본인확인과 고객정보 정확성",
-                  "추천 종목 개수",
-                  "휴대폰 배경화면",
-                  "고객의 취미"
-            ],
-            "answer": 0,
-            "explanation": "금융거래는 본인확인과 정확한 고객정보 확인이 기본입니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "명의이전",
-            "question": "80. 주식 명의이전 업무에서 먼저 확인해야 하는 것은?",
-            "options": [
-                  "서류의 당사자와 대상 증권 정보",
-                  "고객의 사적인 일정",
-                  "주가 예측 자료",
-                  "SNS 게시물"
-            ],
-            "answer": 0,
-            "explanation": "명의이전은 당사자, 대상 증권, 수량, 서명 등 핵심 정보 확인이 중요합니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "명의이전",
-            "question": "81. 서류상 이름과 신분증 이름이 다를 때 올바른 조치는?",
-            "options": [
-                  "임의로 수정한다",
-                  "그대로 진행한다",
-                  "업무를 중단하고 관리자에게 확인한다",
-                  "서명을 대신한다"
-            ],
-            "answer": 2,
-            "explanation": "불일치가 있으면 임의 처리하지 않고 확인 절차를 거쳐야 합니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "고객 응대",
-            "question": "82. 고객 방문 전 가장 적절한 준비는?",
-            "options": [
-                  "방문 목적·시간·필요 서류를 사전 확인한다",
-                  "아무 연락 없이 방문한다",
-                  "고객 정보를 외부에 공유한다",
-                  "서류 없이 방문한다"
-            ],
-            "answer": 0,
-            "explanation": "방문 전 일정과 준비물을 명확히 확인해야 민원을 예방할 수 있습니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "고객 응대",
-            "question": "83. 고객에게 업무를 설명할 때 가장 바람직한 태도는?",
-            "options": [
-                  "전문용어만 빠르게 말한다",
-                  "쉽고 정확하게 설명하고 질문을 확인한다",
-                  "불필요한 압박을 준다",
-                  "서류를 보여주지 않는다"
-            ],
-            "answer": 1,
-            "explanation": "고객이 이해할 수 있게 설명하고 동의 여부를 명확히 확인해야 합니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "서류 검수",
-            "question": "84. 서명·날인 확인 시 올바른 방법은?",
-            "options": [
-                  "필수 위치와 이름, 날짜를 함께 확인한다",
-                  "빈칸은 무조건 넘어간다",
-                  "대신 서명한다",
-                  "사진만 찍고 폐기한다"
-            ],
-            "answer": 0,
-            "explanation": "서명·날인·날짜·필수 기재사항을 함께 확인해야 합니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "서류 검수",
-            "question": "85. 필수 서류가 누락되었을 때 해야 할 일은?",
-            "options": [
-                  "임의로 대체한다",
-                  "누락 사실을 기록하고 보완 요청한다",
-                  "고객 몰래 작성한다",
-                  "서류를 폐기한다"
-            ],
-            "answer": 1,
-            "explanation": "누락 서류는 기록 후 공식 절차에 따라 보완해야 합니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "인수인계",
-            "question": "86. 서류나 자산 인계 시 가장 중요한 것은?",
-            "options": [
-                  "인계 일시·대상·수량·상태를 기록한다",
-                  "기억에만 의존한다",
-                  "개인 차량에 장기 보관한다",
-                  "사진을 SNS에 올린다"
-            ],
-            "answer": 0,
-            "explanation": "인수인계는 추적 가능하도록 기록과 확인 절차를 남겨야 합니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "인수인계",
-            "question": "87. 업무 중 중요한 원본 서류를 보관할 때 올바른 원칙은?",
-            "options": [
-                  "지정된 보관 방식과 전달 기한을 따른다",
-                  "개인 가방에 오래 보관한다",
-                  "가족에게 맡긴다",
-                  "카페에 두고 간다"
-            ],
-            "answer": 0,
-            "explanation": "원본 서류는 분실·훼손 방지를 위해 내부 규정에 따라 관리해야 합니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "개인정보보호",
-            "question": "88. 고객 신분증 사진을 개인 메신저로 전송해도 되는가?",
-            "options": [
-                  "항상 가능하다",
-                  "업무 편의를 위해 가능하다",
-                  "내부 승인된 안전한 절차가 아니면 금지된다",
-                  "친한 직원에게는 가능하다"
-            ],
-            "answer": 2,
-            "explanation": "개인정보는 승인된 시스템과 절차 안에서만 처리해야 합니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "개인정보보호",
-            "question": "89. 개인정보 처리의 기본 원칙은?",
-            "options": [
-                  "필요한 범위에서만 수집·이용한다",
-                  "많이 모을수록 좋다",
-                  "외부에 자유롭게 공유한다",
-                  "퇴사 후에도 보관한다"
-            ],
-            "answer": 0,
-            "explanation": "개인정보는 목적에 필요한 최소 범위에서 처리해야 합니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "컴플라이언스",
-            "question": "90. 업무 지시가 내부 규정과 다르게 느껴질 때 올바른 대응은?",
-            "options": [
-                  "무조건 따른다",
-                  "규정과 관리자 확인을 요청한다",
-                  "고객에게 숨긴다",
-                  "개인 판단으로 생략한다"
-            ],
-            "answer": 1,
-            "explanation": "규정과 다를 가능성이 있으면 즉시 확인하고 기록해야 합니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "컴플라이언스",
-            "question": "91. 금융 관련 업무에서 하면 안 되는 행동은?",
-            "options": [
-                  "확인된 절차에 따라 안내",
-                  "고객에게 특정 투자수익을 보장한다고 말하기",
-                  "서류 누락 보고",
-                  "개인정보 보호"
-            ],
-            "answer": 1,
-            "explanation": "수익 보장, 허위·과장 설명, 무자격 투자권유는 위험합니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "출장 업무",
-            "question": "92. 출장 업무 후 필수 보고 내용으로 적절한 것은?",
-            "options": [
-                  "방문 결과, 수령 서류, 특이사항",
-                  "점심 메뉴만 보고",
-                  "고객 사생활 평가",
-                  "보고 생략"
-            ],
-            "answer": 0,
-            "explanation": "업무 보고에는 결과와 특이사항이 포함되어야 합니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "출장 업무",
-            "question": "93. 교통비·출장비 정산 시 올바른 태도는?",
-            "options": [
-                  "실제 사용 내역과 기준에 맞게 신청한다",
-                  "사용하지 않은 금액도 청구한다",
-                  "영수증을 조작한다",
-                  "타인 내역을 사용한다"
-            ],
-            "answer": 0,
-            "explanation": "정산은 실제 지출과 회사 기준에 맞아야 합니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "리스크 관리",
-            "question": "94. 고객이 서류 내용을 이해하지 못했다고 말할 때 조치는?",
-            "options": [
-                  "무시하고 서명받는다",
-                  "설명을 중단하고 집으로 간다",
-                  "충분히 설명하고 필요 시 담당자 확인을 연결한다",
-                  "대신 결정한다"
-            ],
-            "answer": 2,
-            "explanation": "고객 이해와 자발적 동의가 중요합니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "리스크 관리",
-            "question": "95. 분실 사고가 발생했을 때 가장 먼저 해야 할 일은?",
-            "options": [
-                  "숨긴다",
-                  "즉시 관리자에게 보고하고 사고 절차를 따른다",
-                  "나중에 기억나면 말한다",
-                  "임의로 새로 만든다"
-            ],
-            "answer": 1,
-            "explanation": "분실·오류·사고는 즉시 보고해야 피해를 줄일 수 있습니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "자산 행정",
-            "question": "96. 자산 행정 매니저의 역할로 가장 적절한 것은?",
-            "options": [
-                  "정해진 절차에 따라 서류 안내와 확인을 지원한다",
-                  "고객 자산을 임의로 운용한다",
-                  "투자를 강요한다",
-                  "법률 판단을 대신한다"
-            ],
-            "answer": 0,
-            "explanation": "역할 범위 내에서 안내·확인·전달 업무를 수행해야 합니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "자산 행정",
-            "question": "97. 고객 동의 없이 진행해도 되는 업무는?",
-            "options": [
-                  "없다",
-                  "단순 서명은 가능하다",
-                  "급하면 가능하다",
-                  "상사가 말하면 가능하다"
-            ],
-            "answer": 0,
-            "explanation": "고객 동의와 공식 절차 없이 진행하면 안 됩니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 실무",
-            "question": "98. 주식 수량 기재 오류를 발견했을 때 대응은?",
-            "options": [
-                  "수정액으로 임의 수정",
-                  "그대로 제출",
-                  "오류를 표시하고 재확인·보완 절차를 진행",
-                  "고객에게 말하지 않는다"
-            ],
-            "answer": 2,
-            "explanation": "수량 오류는 권리관계에 영향을 줄 수 있어 반드시 재확인해야 합니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "증권 실무",
-            "question": "99. 증권 관련 서류에서 날짜가 중요한 이유는?",
-            "options": [
-                  "절차의 효력과 처리 순서를 확인하기 위해",
-                  "글씨가 예뻐 보이기 위해",
-                  "파일명을 만들기 위해",
-                  "필수 사항이 아니다"
-            ],
-            "answer": 0,
-            "explanation": "날짜는 동의 시점과 처리 흐름을 판단하는 중요한 정보입니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      },
-      {
-            "category": "최종 평가",
-            "question": "100. 업무 수행의 가장 기본 원칙은?",
-            "options": [
-                  "정확성, 투명성, 기록, 보안",
-                  "속도만 중요",
-                  "구두 약속만 중요",
-                  "비공식 처리 우선"
-            ],
-            "answer": 0,
-            "explanation": "자산 행정 업무는 정확한 확인, 투명한 설명, 기록, 보안이 핵심입니다. 반복 학습 5회차에서는 실제 현장에서 같은 원칙을 적용하는지 점검합니다."
-      }
-];
-
-    let quizState = { current:0, score:0, solved:false };
-
-    function loadQuizState(data = {}){
-      const local = JSON.parse(localStorage.getItem('waterbridgeQuizState') || 'null');
-      quizState = data.quizState || local || { current:0, score:0, solved:false };
-      if(quizState.current >= QUIZ_QUESTIONS.length) quizState.current = QUIZ_QUESTIONS.length - 1;
-      renderQuiz();
-    }
-
-    async function saveQuizState(){
-      localStorage.setItem('waterbridgeQuizState', JSON.stringify(quizState));
-      if(window.userRef && window.updateDoc){
-        await window.updateDoc(window.userRef, { quizState, quizProgress: quizState.current + (quizState.solved ? 1 : 0), quizScore: quizState.score, lastSeen: Date.now() });
+  videoTimer=setInterval(()=>{
+    if(quizMode || !ytPlayer || !ytPlayer.getPlayerState) return;
+    if(ytPlayer.getPlayerState()===YT.PlayerState.PLAYING){
+      currentTime++;
+      safeSeconds++;
+      document.getElementById("watchTimeText").textContent="시청 시간 "+formatSeconds(currentTime);
+      if(safeSeconds >= WATCH_SECONDS_FOR_COMPLETE && !videoEnded){
+        finishVideo();
       }
     }
+  },1000);
 
-    function renderQuiz(){
-      const q = QUIZ_QUESTIONS[quizState.current];
-      const solvedCount = Math.min(QUIZ_QUESTIONS.length, quizState.current + (quizState.solved ? 1 : 0));
-      const percent = Math.round((solvedCount / QUIZ_QUESTIONS.length) * 100);
-      document.getElementById('quizCurrentText').textContent = `${Math.min(quizState.current + 1, QUIZ_QUESTIONS.length)} / ${QUIZ_QUESTIONS.length}`;
-      document.getElementById('quizScoreText').textContent = `${quizState.score}개`;
-      document.getElementById('quizPercentText').textContent = `${percent}%`;
-      const completedAll = quizState.current >= QUIZ_QUESTIONS.length - 1 && quizState.solved;
-      const passText = document.getElementById('quizPassText');
-      const certBtn = document.getElementById('certificateBtn');
-      if(passText) passText.textContent = completedAll ? '수료 완료' : '진행중';
-      if(certBtn) certBtn.disabled = !completedAll;
-      document.getElementById('quizCategory').textContent = q.category;
-      document.getElementById('quizQuestion').textContent = q.question;
-      document.getElementById('quizFeedback').className = 'quiz-feedback';
-      document.getElementById('quizFeedback').textContent = '';
-      document.getElementById('quizNextBtn').disabled = !quizState.solved;
-      document.getElementById('quizNextBtn').textContent = quizState.current === QUIZ_QUESTIONS.length - 1 ? '완료하기' : '다음 문항 →';
-      document.getElementById('quizOptions').innerHTML = q.options.map((opt, idx) => `
-        <button class="quiz-option" type="button" onclick="checkQuizAnswer(${idx})">${idx + 1}. ${opt}</button>
-      `).join('');
-      if(quizState.solved){
-        const buttons = document.querySelectorAll('.quiz-option');
-        buttons.forEach((btn, idx) => { btn.disabled = true; if(idx === q.answer) btn.classList.add('correct'); });
-        const feedback = document.getElementById('quizFeedback');
-        feedback.textContent = '정답입니다. ' + q.explanation;
-        feedback.classList.add('show');
-      }
+  guardTimer=setInterval(()=>{
+    if(quizMode || !ytPlayer || !ytPlayer.getCurrentTime) return;
+    const playerTime=ytPlayer.getCurrentTime() || 0;
+    const rate=ytPlayer.getPlaybackRate ? ytPlayer.getPlaybackRate() : 1;
+    if(rate!==1){
+      restartVideo("재생속도 조작이 감지되어 처음부터 다시 시작합니다.");
+      return;
     }
+    if(playerTime > safeSeconds + 4){
+      restartVideo("영상 이동이 감지되어 처음부터 다시 시작합니다.");
+      return;
+    }
+  },600);
+}
 
-    async function checkQuizAnswer(index){
-      if(quizState.solved) return;
-      const q = QUIZ_QUESTIONS[quizState.current];
-      const buttons = document.querySelectorAll('.quiz-option');
-      const feedback = document.getElementById('quizFeedback');
-      buttons.forEach(btn => btn.disabled = true);
+function restartVideo(msg){
+  clearInterval(videoTimer);
+  clearInterval(guardTimer);
+  currentTime=0;
+  safeSeconds=0;
+  document.getElementById("watchTimeText").textContent="시청 시간 0초";
+  if(ytPlayer && ytPlayer.seekTo){
+    ytPlayer.seekTo(0,true);
+    ytPlayer.setPlaybackRate(1);
+    ytPlayer.playVideo();
+  }
+  showToast(msg || "조작이 감지되어 처음부터 다시 시작합니다.");
+  startProtection();
+}
 
-      if(index === q.answer){
-        buttons[index].classList.add('correct');
-        quizState.solved = true;
-        quizState.score += 1;
-        feedback.textContent = '정답입니다. ' + q.explanation;
-        feedback.className = 'quiz-feedback show';
-        document.getElementById('quizNextBtn').disabled = false;
-        showToast('정답입니다. 다음 문항이 열렸습니다.');
-        await saveQuizState();
+function finishVideo(){
+  if(videoEnded) return;
+  videoEnded=true;
+  clearInterval(videoTimer);
+  clearInterval(guardTimer);
+
+  if(!latestUserData.completedCourseIds.includes(currentCourseId)){
+    latestUserData.completedCourseIds.push(currentCourseId);
+  }
+  saveData();
+  
+function getCourseImage(courseId){
+ const images = {
+  asset_admin_intro:'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?w=800',
+  securities_basic:'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800',
+  ownership_transfer:'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800',
+  customer_visit:'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800',
+  document_review:'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800',
+  asset_handover:'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800',
+  privacy_compliance:'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800',
+  final_assessment:'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800'
+ };
+ return images[courseId] || 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800';
+}
+
+renderDashboard();
+  renderCourses();
+
+  if(ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo();
+  startQuiz(currentCourseId);
+}
+
+function startQuiz(courseId){
+  quizMode=true;
+  quizCourseId=courseId;
+  quizIndex=0;
+  const course=getCourse(courseId);
+  document.getElementById("videoBox").classList.add("quiz-mode");
+  document.getElementById("videoTitle").textContent=course.title+" 퀴즈";
+  document.getElementById("quizTitle").textContent=course.title+" 퀴즈";
+  renderQuiz();
+}
+
+function renderQuiz(){
+  const course=getCourse(quizCourseId);
+  const list=createQuiz(course);
+  const q=list[quizIndex];
+  document.getElementById("quizCount").textContent=(quizIndex+1)+" / "+list.length;
+  document.getElementById("quizQuestion").textContent=q.question;
+  document.getElementById("quizOptions").innerHTML=q.options.map((opt,i)=>`<button class="quiz-option" type="button" onclick="answerQuiz(${i})">${opt}</button>`).join("");
+  const fb=document.getElementById("quizFeedback");
+  fb.style.display="none";
+  fb.textContent="";
+}
+
+function answerQuiz(selected){
+  const course=getCourse(quizCourseId);
+  const list=createQuiz(course);
+  const q=list[quizIndex];
+  const btns=document.querySelectorAll("#quizOptions .quiz-option");
+  btns.forEach((btn,i)=>{
+    btn.disabled=true;
+    if(i===q.answer) btn.classList.add("correct");
+    if(i===selected && i!==q.answer) btn.classList.add("wrong");
+  });
+
+  const fb=document.getElementById("quizFeedback");
+  fb.style.display="block";
+
+  if(selected===q.answer){
+    fb.textContent="정답입니다. 다음 문항으로 이동합니다.";
+    quizIndex++;
+    setTimeout(()=>{
+      if(quizIndex>=list.length){
+        fb.textContent="퀴즈가 완료되었습니다.";
+        showToast("퀴즈 완료!");
+        setTimeout(closeVideo,900);
+      }else{
         renderQuiz();
-      }else{
-        buttons[index].classList.add('wrong');
-        feedback.textContent = '오답입니다. 다시 생각해보세요. 정답을 맞혀야 다음 문항으로 넘어갈 수 있습니다.';
-        feedback.className = 'quiz-feedback show';
-        setTimeout(() => { buttons.forEach(btn => { btn.disabled = false; btn.classList.remove('wrong'); }); }, 700);
       }
-    }
-
-    async function goNextQuiz(){
-      if(!quizState.solved){ showToast('정답을 맞혀야 다음 문항으로 이동합니다.'); return; }
-      if(quizState.current >= QUIZ_QUESTIONS.length - 1){
-        showToast(`최종 평가 완료! 수료증 출력이 가능합니다.`);
-        return;
-      }
-      quizState.current += 1;
-      quizState.solved = false;
-      await saveQuizState();
+    },650);
+  }else{
+    fb.textContent="오답입니다. 1번 문항부터 다시 시작합니다.";
+    setTimeout(()=>{
+      quizIndex=0;
       renderQuiz();
-      document.getElementById('quiz').scrollIntoView({behavior:'smooth',block:'start'});
-    }
+      showToast("오답! 1번 문제로 돌아갑니다.");
+    },900);
+  }
+}
 
-    async function resetQuizProgress(){
-      if(!confirm('퀴즈 진행상황을 처음부터 다시 시작할까요?')) return;
-      quizState = { current:0, score:0, solved:false };
-      await saveQuizState();
-      renderQuiz();
-      showToast('퀴즈가 초기화되었습니다.');
-    }
+function closeVideo(){
+  clearInterval(videoTimer);
+  clearInterval(guardTimer);
+  if(ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo();
+  document.getElementById("videoModal").classList.remove("active");
+  document.getElementById("videoBox").classList.remove("quiz-mode");
+  currentCourseId=null;
+  currentTime=0;
+  safeSeconds=0;
+  quizMode=false;
+}
 
-    function printCertificate(){
-      const completedAll = quizState.current >= QUIZ_QUESTIONS.length - 1 && quizState.solved;
-      if(!completedAll){ showToast('100문항 평가 완료 후 출력할 수 있습니다.'); return; }
-      const name = document.getElementById('userName')?.textContent || '학습자';
-      const today = new Date().toLocaleDateString('ko-KR');
-      const html = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>수료증</title><style>body{font-family:Arial,sans-serif;padding:50px;background:#f8fafc}.cert{max-width:760px;margin:auto;background:white;border:10px solid #1e3a8a;padding:60px;text-align:center}.brand{color:#2563eb;font-weight:800}.title{font-size:44px;font-weight:900;margin:30px 0}.name{font-size:30px;font-weight:800;margin:25px 0}.txt{font-size:18px;line-height:1.8;color:#334155}.date{margin-top:40px;font-weight:700}</style></head><body><div class="cert"><div class="brand">WaterBridge LMS</div><div class="title">수 료 증</div><div class="name">${name}</div><div class="txt">위 학습자는 WaterBridge 자산 행정 실무 과정과<br>100문항 최종 평가를 정상적으로 완료하였음을 증명합니다.</div><div class="date">수료일: ${today}</div></div><script>window.print()<\/script></body></html>`;
-      const w = window.open('', '_blank');
-      if(w){ w.document.write(html); w.document.close(); }
-    }
+function scrollToContinue(){
+  const completed=latestUserData.completedCourseIds || [];
+  const next=COURSES.find(c=>!completed.includes(c.id) && (!c.required || completed.includes(c.required))) || COURSES[0];
+  document.querySelector("#courses").scrollIntoView({behavior:"smooth"});
+}
 
-    async function logout(){
-      try{
-        if(window.userRef && window.updateDoc){ await window.updateDoc(window.userRef,{ online:false,lastSeen:Date.now() }); }
-      }finally{ location.replace('index.html'); }
-    }
+function logout(){
+  location.href="index.html";
+}
 
-    document.addEventListener('keydown', e => { if(e.key === 'Escape') closeVideo(); });
-    renderCourses();
-    updateDashboard();
-    loadQuizState();
-  </script>
+document.addEventListener("keydown",function(e){
+  const modalOpen=document.getElementById("videoModal").classList.contains("active");
+  if(modalOpen && !quizMode && (e.key==="ArrowRight" || e.key==="ArrowLeft")){
+    e.preventDefault();
+    restartVideo("화살표 키 조작이 감지되어 처음부터 다시 시작합니다.");
+  }
+},true);
 
-  <script type="module">
-    import { auth, db } from './firebase-config.js';
-    import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js';
-    import { doc, getDoc, setDoc, updateDoc, arrayUnion, increment } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
 
-    window.updateDoc = updateDoc;
-    window.arrayUnion = arrayUnion;
-    window.increment = increment;
+function getCourseImage(courseId){
+ const images = {
+  asset_admin_intro:'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?w=800',
+  securities_basic:'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800',
+  ownership_transfer:'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800',
+  customer_visit:'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800',
+  document_review:'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800',
+  asset_handover:'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800',
+  privacy_compliance:'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800',
+  final_assessment:'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800'
+ };
+ return images[courseId] || 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800';
+}
 
-    onAuthStateChanged(auth, async user => {
-      if(!user){ location.replace('index.html'); return; }
-
-      window.userRef = doc(db, 'users', user.uid);
-      await setDoc(window.userRef, {
-        online:true,
-        lastSeen:Date.now(),
-        email:user.email || '',
-        totalCourses:COURSES.length
-      }, { merge:true });
-
-      const snap = await getDoc(window.userRef);
-      const data = snap.exists() ? snap.data() : {};
-      latestUserData = {
-        ...data,
-        email:data.email || user.email || '',
-        completedCourseIds:data.completedCourseIds || [],
-        videoProgress:data.videoProgress || {}
-      };
-
-      document.getElementById('userName').textContent = latestUserData.name || user.displayName || '학습자';
-      document.getElementById('userEmail').textContent = latestUserData.email || '';
-      document.getElementById('userGrade').textContent = latestUserData.grade || '일반';
-      document.getElementById('onlineStatus').textContent = '🟢 온라인';
-      document.getElementById('profileOnline').textContent = '온라인';
-      document.getElementById('lastSeenText').textContent = '방금 전';
-
-      updateDashboard(latestUserData);
-      renderCourses(latestUserData);
-      loadQuizState(latestUserData);
-    });
-
-    window.addEventListener('visibilitychange', async () => {
-      if(!window.userRef) return;
-      if(document.hidden){
-        await updateDoc(window.userRef,{ online:false,lastSeen:Date.now() });
-        document.getElementById('onlineStatus').textContent = '⚪ 자리비움';
-        document.getElementById('profileOnline').textContent = '자리비움';
-      }else{
-        await setDoc(window.userRef,{ online:true,lastSeen:Date.now() },{ merge:true });
-        document.getElementById('onlineStatus').textContent = '🟢 온라인';
-        document.getElementById('profileOnline').textContent = '온라인';
-      }
-    });
-
-    window.addEventListener('pageshow', event => { if(event.persisted) location.reload(); });
-  </script>
+renderDashboard();
+renderCourses();
+document.getElementById("onlineStatus").textContent="연결됨";
+</script>
 </body>
 </html>
