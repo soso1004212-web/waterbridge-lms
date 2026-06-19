@@ -431,7 +431,11 @@ window.renderUsers = function(){
       ? `<button class="btn ghost small" onclick="sendResetPassword('${String(u.email || '').replace(/'/g, "\\'")}')">비밀번호재설정</button>`
       : '';
 
-    const actionButtons = approvalButton + roleButton + resetButton;
+    const forceLogoutButton = currentAdmin && currentAdmin.uid === u.id
+      ? ''
+      : `<button class="btn danger small" onclick="forceLogoutUser('${u.id}')">강제로그아웃</button>`;
+
+    const actionButtons = approvalButton + roleButton + resetButton + forceLogoutButton;
     return `
     <tr>
       <td><b>${esc(u.name || '이름 없음')}</b><br><span style="color:#64748b;font-size:13px">${esc(u.email || '')}</span></td>
@@ -531,6 +535,32 @@ window.sendResetPassword = async function(email){
     console.error(e);
     toast('메일 발송에 실패했습니다. 이메일 또는 Firebase 설정을 확인하세요.');
   }
+}
+
+
+window.forceLogoutUser = async function(uid){
+  if(currentAdmin && currentAdmin.uid === uid){
+    toast('본인 계정은 강제 로그아웃할 수 없습니다.');
+    return;
+  }
+
+  const target = allUsers.find(u => u.id === uid);
+  const label = target?.email || target?.name || '이 회원';
+
+  if(!confirm(`${label} 계정을 강제 로그아웃시키겠습니까?`)) return;
+
+  await updateDoc(doc(db, 'users', uid), {
+    forceLogout: true,
+    forceLogoutAt: Date.now(),
+    forceLogoutBy: currentAdmin?.uid || null,
+    online: false,
+    currentCourse: null,
+    currentCourseTitle: null,
+    lastSeen: Date.now()
+  });
+
+  toast('강제 로그아웃 신호를 보냈습니다.');
+  await loadUsers();
 }
 
 function startOnlineListener(){
