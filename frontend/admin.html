@@ -95,6 +95,39 @@ textarea:focus{
   white-space:nowrap;
 }
 
+
+.password-modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(15,23,42,.58);
+  z-index:120;
+  padding:20px;
+}
+.password-modal.active{display:flex}
+.password-card{
+  width:min(480px,100%);
+  background:#fff;
+  border:1px solid var(--line);
+  box-shadow:0 24px 70px rgba(15,23,42,.28);
+  border-radius:22px;
+  overflow:hidden;
+}
+.password-card-head{
+  padding:20px 22px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+}
+.password-card-head h3{font-size:18px}
+.password-card-body{padding:22px}
+.password-card-body p{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:14px}
+.password-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+
 </style>
 </head>
 <body>
@@ -174,7 +207,7 @@ textarea:focus{
     </section>
 
     <section id="users" class="panel" style="margin-top:18px">
-      <div class="panel-head"><div><h3>👥 회원 목록</h3><p>회원 승인 상태, 역할, 학습 상태를 확인하고 승인/승인취소, 비밀번호 재설정, 관리자 권한 부여를 처리합니다.</p></div><div class="user-tools"><input id="userSearch" class="search" placeholder="이름/이메일 검색" oninput="renderUsers()"><button class="btn primary small" onclick="loadUsers()">새로고침</button></div></div>
+      <div class="panel-head"><div><h3>👥 회원 목록</h3><p>회원 승인 상태, 역할, 학습 상태를 확인하고 승인/승인취소, 비밀번호 직접 변경, 관리자 권한 부여를 처리합니다.</p></div><div class="user-tools"><input id="userSearch" class="search" placeholder="이름/이메일 검색" oninput="renderUsers()"><button class="btn primary small" onclick="loadUsers()">새로고침</button></div></div>
       <div class="table-wrap"><table><thead><tr><th>회원</th><th>승인 상태</th><th>역할</th><th>완료 강의</th><th>포인트</th><th>접속 상태</th><th>최근 활동</th><th>관리</th></tr></thead><tbody id="userTable"><tr><td colspan="8">로딩중...</td></tr></tbody></table></div>
     </section>
 
@@ -184,11 +217,38 @@ textarea:focus{
     </section>
   </main>
 </div>
+
+<div class="password-modal" id="passwordModal">
+  <div class="password-card">
+    <div class="password-card-head">
+      <h3>비밀번호 직접 변경</h3>
+      <button class="btn ghost small" onclick="closePasswordModal()">닫기</button>
+    </div>
+    <div class="password-card-body">
+      <p id="passwordTargetText">대상 회원을 선택하세요.</p>
+      <input type="hidden" id="passwordTargetUid">
+      <input type="hidden" id="passwordTargetEmail">
+      <div class="field">
+        <label for="newPassword">새 비밀번호</label>
+        <input id="newPassword" type="password" placeholder="6자 이상 입력">
+      </div>
+      <div class="field">
+        <label for="newPasswordConfirm">새 비밀번호 확인</label>
+        <input id="newPasswordConfirm" type="password" placeholder="동일하게 입력">
+      </div>
+      <div class="password-actions">
+        <button class="btn ghost" onclick="closePasswordModal()">취소</button>
+        <button class="btn primary" onclick="changeUserPassword()">변경하기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
 import { auth, db } from "./firebase-config.js";
-import { onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 import { collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 let allUsers = [];
@@ -428,7 +488,7 @@ window.renderUsers = function(){
       : `<button class="btn primary small" onclick="makeAdmin('${u.id}')">관리자승격</button>`;
 
     const resetButton = u.email
-      ? `<button class="btn ghost small" onclick="sendResetPassword('${String(u.email || '').replace(/'/g, "\\'")}')">비밀번호재설정</button>`
+      ? `<button class="btn ghost small" onclick="openPasswordModal('${u.id}', '${String(u.email || '').replace(/'/g, "\\'")}')">비밀번호변경</button>`
       : '';
 
     const forceLogoutButton = currentAdmin && currentAdmin.uid === u.id
@@ -523,19 +583,6 @@ window.makeUser = async function(uid){
   await loadUsers();
 }
 
-window.sendResetPassword = async function(email){
-  if(!email){ toast('이메일 정보가 없습니다.'); return; }
-
-  if(!confirm(`${email} 주소로 비밀번호 재설정 메일을 보내시겠습니까?`)) return;
-
-  try{
-    await sendPasswordResetEmail(auth, email);
-    toast('비밀번호 재설정 메일을 발송했습니다.');
-  }catch(e){
-    console.error(e);
-    toast('메일 발송에 실패했습니다. 이메일 또는 Firebase 설정을 확인하세요.');
-  }
-}
 
 
 window.forceLogoutUser = async function(uid){
@@ -561,6 +608,67 @@ window.forceLogoutUser = async function(uid){
 
   toast('강제 로그아웃 신호를 보냈습니다.');
   await loadUsers();
+}
+
+
+window.openPasswordModal = function(uid, email){
+  $('passwordTargetUid').value = uid;
+  $('passwordTargetEmail').value = email || '';
+  $('newPassword').value = '';
+  $('newPasswordConfirm').value = '';
+  $('passwordTargetText').textContent = `${email || '선택한 회원'} 계정의 비밀번호를 관리자 권한으로 변경합니다.`;
+  $('passwordModal').classList.add('active');
+}
+
+window.closePasswordModal = function(){
+  $('passwordModal').classList.remove('active');
+}
+
+window.changeUserPassword = async function(){
+  const uid = $('passwordTargetUid').value;
+  const email = $('passwordTargetEmail').value;
+  const password = $('newPassword').value;
+  const confirmPassword = $('newPasswordConfirm').value;
+
+  if(!uid){ toast('대상 회원이 없습니다.'); return; }
+  if(!password || password.length < 6){ toast('비밀번호는 6자 이상이어야 합니다.'); return; }
+  if(password !== confirmPassword){ toast('비밀번호 확인이 일치하지 않습니다.'); return; }
+
+  if(!confirm(`${email || '선택한 회원'}의 비밀번호를 직접 변경하시겠습니까?`)) return;
+
+  try{
+    const token = await auth.currentUser.getIdToken(true);
+
+    const res = await fetch('/api/admin-update-password', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ uid, password })
+    });
+
+    const result = await res.json().catch(() => ({}));
+
+    if(!res.ok){
+      throw new Error(result.error || '비밀번호 변경 실패');
+    }
+
+    await updateDoc(doc(db, 'users', uid), {
+      passwordChangedAt: Date.now(),
+      passwordChangedBy: currentAdmin?.uid || null,
+      forceLogout: true,
+      forceLogoutAt: Date.now(),
+      online: false
+    });
+
+    toast('비밀번호가 변경되었습니다. 해당 회원은 다시 로그인해야 합니다.');
+    closePasswordModal();
+    await loadUsers();
+  }catch(e){
+    console.error(e);
+    toast(e.message || '비밀번호 변경 중 오류가 발생했습니다.');
+  }
 }
 
 function startOnlineListener(){

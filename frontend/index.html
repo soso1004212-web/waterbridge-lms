@@ -50,6 +50,19 @@ body{min-height:100vh;background:var(--bg);color:var(--text)}
 .login{padding:46px 42px;background:#fff}.login h2{font-size:27px;letter-spacing:-.6px;color:var(--navy);margin-bottom:8px}.login-desc{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:30px}.field{margin-bottom:18px}.field label{display:block;font-size:14px;font-weight:600;margin-bottom:8px;color:#374151}.input-row{position:relative}.input-row input{width:100%;height:50px;border:1px solid #cfd8e3;border-radius:6px;padding:0 14px;font-size:15px;outline:none;background:#fff}.input-row input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(36,86,166,.12)}.password-toggle{position:absolute;right:8px;top:8px;height:34px;padding:0 10px;border:1px solid #d7dee8;background:#f8fafc;border-radius:5px;color:#4b5563;font-size:12px;font-weight:600;cursor:pointer}.options{display:flex;align-items:center;justify-content:space-between;margin:4px 0 22px;font-size:13px;color:#4b5563}.check{display:flex;gap:7px;align-items:center}.check input{accent-color:var(--blue)}.text-btn{border:0;background:transparent;color:var(--blue);font-weight:600;cursor:pointer;font-size:13px}.btn{height:50px;border:0;border-radius:6px;font-weight:700;font-size:15px;cursor:pointer}.login-btn{width:100%;background:var(--blue);color:#fff}.login-btn:hover{background:var(--blue-dark)}.login-btn:disabled{opacity:.7;cursor:not-allowed}.sub{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.sub .btn{background:#f8fafc;border:1px solid #d7dee8;color:#374151}.sub .btn:hover{background:#eef2f7}.msg{min-height:20px;margin-top:16px;font-size:14px;font-weight:600;text-align:center;line-height:1.45}.msg.error{color:var(--red)}.msg.success{color:var(--green)}.msg.info{color:var(--blue)}.notice{margin-top:24px;background:#f8fafc;border:1px solid #e1e7ef;border-radius:6px;padding:14px 15px;color:#5b6472;font-size:13px;line-height:1.65}.footer{margin-top:28px;padding-top:20px;border-top:1px solid #eef2f7;color:#8a94a3;font-size:12px;text-align:center}.spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.45);border-top-color:white;border-radius:50%;animation:spin .8s linear infinite;display:none;margin-right:8px;vertical-align:-2px}.loading .spinner{display:inline-block}@keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:860px){.wrap{grid-template-columns:1fr}.info{min-height:auto;padding:34px}.login{padding:34px 26px}.header-note{display:none}}
 @media(max-width:520px){.main{padding:22px 14px}.info{display:none}.wrap{border-left:0;border-right:0}.sub{grid-template-columns:1fr}.login h2{font-size:24px}}
+
+.password-help{
+  margin-top:12px;
+  background:#f8fafc;
+  border:1px solid #e1e7ef;
+  border-radius:6px;
+  padding:12px 13px;
+  color:#5b6472;
+  font-size:13px;
+  line-height:1.6;
+  text-align:center;
+}
+
 </style>
 </head>
 <body>
@@ -94,15 +107,16 @@ body{min-height:100vh;background:var(--bg);color:var(--text)}
         </div>
         <div class="options">
           <label class="check"><input type="checkbox" id="rememberEmail"> 이메일 저장</label>
-          <button type="button" class="text-btn" onclick="resetPassword()">비밀번호 재설정</button>
+          <button type="button" class="text-btn" onclick="passwordHelp()">비밀번호 문의</button>
         </div>
         <button type="submit" class="btn login-btn" id="loginBtn"><span class="spinner"></span><span id="loginBtnText">로그인</span></button>
       </form>
 
       <div class="sub">
         <button class="btn" onclick="goSignup()">회원가입</button>
-        <button class="btn" onclick="resetPassword()">비밀번호 재설정</button>
+        <button class="btn" onclick="passwordHelp()">비밀번호 문의</button>
       </div>
+      <div class="password-help">비밀번호를 잊으셨다면 관리자에게 문의해 주세요. 관리자가 계정 확인 후 새 비밀번호로 변경해드립니다.</div>
 
       <div class="msg" id="msg" role="status" aria-live="polite"></div>
 
@@ -115,7 +129,7 @@ body{min-height:100vh;background:var(--bg);color:var(--text)}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -226,16 +240,8 @@ window.login = async () => {
 
 window.goSignup = () => { window.location.href = "signup.html"; };
 
-window.resetPassword = async () => {
-  const email = $("loginEmail").value.trim();
-  if(!email){ setMessage("비밀번호 재설정을 받을 이메일을 입력해 주세요.", "error"); return; }
-  if(!validEmail(email)){ setMessage("이메일 형식을 확인해 주세요.", "error"); return; }
-  try{
-    await sendPasswordResetEmail(auth, email);
-    setMessage("비밀번호 재설정 메일을 전송했습니다.", "success");
-  }catch(e){
-    setMessage("메일 전송에 실패했습니다. 이메일을 확인해 주세요.", "error");
-  }
+window.passwordHelp = () => {
+  setMessage("비밀번호 재설정은 관리자에게 문의해 주세요. 관리자가 확인 후 새 비밀번호로 변경해드립니다.", "info");
 };
 
 $("loginForm").addEventListener("submit", (event) => { event.preventDefault(); window.login(); });
