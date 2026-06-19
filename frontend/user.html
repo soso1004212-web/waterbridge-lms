@@ -108,7 +108,7 @@ body{font-family:Arial,'Pretendard',sans-serif;background:#f5f6f8;color:#1f2937}
     </div>
     <div class="panel">
       <h2>공지사항</h2>
-      <div class="notice"><strong>교육 과정 안내</strong><br><span class="muted">각 영상을 끝까지 시청하면 해당 영상 퀴즈가 바로 시작됩니다.</span></div>
+      <div class="notice"><strong>교육 과정 안내</strong><br><span class="muted">영상 버튼을 누르면 별도 학습 페이지에서 시청하고, 완료 후 퀴즈가 시작됩니다.</span></div>
       <div class="notice"><strong>부정 시청 방지</strong><br><span class="muted">영상 이동·재생속도 조작 감지 시 처음부터 다시 시청해야 합니다.</span></div>
     </div>
   </section>
@@ -129,7 +129,7 @@ body{font-family:Arial,'Pretendard',sans-serif;background:#f5f6f8;color:#1f2937}
   <section id="courses">
     <div class="section-head">
       <h2>강의 목록</h2>
-      <p class="muted">각 영상이 끝나면 같은 영상창에서 퀴즈 10문항이 바로 표시됩니다.</p>
+      <p class="muted">영상 버튼을 누르면 별도 학습 페이지로 이동하며, 영상과 퀴즈 완료 후 이 페이지로 돌아옵니다.</p>
     </div>
     <div class="course-grid" id="courseGrid"></div>
   </section>
@@ -492,6 +492,19 @@ function getCourseImage(courseId){
   final_assessment:'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800'
  };
  return images[courseId] || 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800';
+}
+
+
+/* 별도 학습 페이지 이동 방식 */
+function openVideo(courseId){
+  const course = getCourse(courseId);
+  if(!course) return;
+  if(course.required && !(latestUserData.completedCourseIds || []).includes(course.required)){
+    showToast("이전 강의를 먼저 완료해주세요.");
+    return;
+  }
+  localStorage.setItem("wb_lms_courses", JSON.stringify(COURSES));
+  location.href = "lecture.html?course=" + encodeURIComponent(courseId);
 }
 
 renderDashboard();
