@@ -507,6 +507,22 @@ function openVideo(courseId){
   location.href = "lecture.html?course=" + encodeURIComponent(courseId);
 }
 
+
+function loadProfileInfo(){
+  const name = sessionStorage.getItem("name") || localStorage.getItem("name") || "학습자";
+  const email = sessionStorage.getItem("email") || localStorage.getItem("email") || "-";
+  const role = sessionStorage.getItem("role") || "user";
+
+  const nameEl = document.getElementById("userName");
+  const emailEl = document.getElementById("userEmail");
+  const gradeEl = document.getElementById("userGrade");
+
+  if(nameEl) nameEl.textContent = name;
+  if(emailEl) emailEl.textContent = email;
+  if(gradeEl) gradeEl.textContent = role === "admin" ? "관리자" : "일반";
+}
+
+loadProfileInfo();
 renderDashboard();
 renderCourses();
 document.getElementById("onlineStatus").textContent="연결됨";
